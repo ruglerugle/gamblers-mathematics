@@ -191,6 +191,27 @@ a.head-reset{text-decoration:none;display:inline-flex;align-items:center}
 .showdown-result.tie{color:#f3d99a}
 .step-note{font-size:13px;line-height:1.7;color:var(--ink);margin-top:10px}
 .table-felt .step-note{color:#e5f2eb}
+.pcard.back{background:repeating-linear-gradient(45deg,var(--felt),var(--felt) 4px,var(--felt-dark) 4px,var(--felt-dark) 8px);border-color:rgba(255,255,255,.35)}
+
+/* Multi-seat betting table (persistent bankroll, 3-handed → heads-up) */
+.cpu-seats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.cpu-seat{background:rgba(0,0,0,.22);border-radius:10px;padding:10px 12px;min-width:126px;text-align:center;transition:opacity .2s}
+.cpu-seat.folded{opacity:.4}
+.cpu-seat.you{background:rgba(217,164,65,.22);border:1px solid var(--gold)}
+.cpu-seat.turn{outline:2px dashed #f3d99a;box-shadow:0 0 0 4px rgba(243,217,154,.18)}
+.cpu-seat-name{color:#fff;font-size:12px;font-weight:900;margin-bottom:2px;display:flex;align-items:center;justify-content:center;gap:5px}
+.cpu-seat-pos{display:inline-block;font-size:9px;font-weight:950;color:#123;background:#e8c07f;border-radius:4px;padding:1px 5px}
+.cpu-seat-stack{color:#f3d99a;font-size:11px;font-weight:800;margin-bottom:6px}
+.cpu-seat-cards{display:flex;gap:3px;justify-content:center;margin-bottom:5px}
+.cpu-seat-cards .pcard{width:34px;height:47px;padding:2px 3px}
+.cpu-seat-cards .pcard-corner{font-size:9px}
+.cpu-seat-cards .pcard-suit-big{font-size:15px}
+.cpu-seat-tag{display:inline-block;font-size:9.5px;font-weight:950;color:#123;background:#8ef0b0;border-radius:5px;padding:1px 7px}
+.cpu-seat-tag.fold{background:#7a3530;color:#fff}
+.cpu-seat-tag.allin{background:#8b3fae;color:#fff}
+.cpu-seat-bet{font-size:10.5px;color:#a9c7be;margin-top:5px;min-height:14px}
+.action-log{font-size:12px;color:#e5f2eb;line-height:1.8;margin-top:12px;max-height:120px;overflow-y:auto;background:rgba(0,0,0,.2);border-radius:8px;padding:8px 10px}
+.hand-progress{color:#cfe4de;font-size:11.5px;font-weight:800;margin-bottom:6px}
 
 /* Ending */
 .ending{text-align:center;padding:20px 10px}
@@ -464,90 +485,350 @@ function renderDialogue(lines){
 /* =====================================================================
    Stage: 総合チャレンジ：CPU対戦 (interactive, non-MCQ)
    ===================================================================== */
+/* =====================================================================
+   betting engine (3-handed with persistent bankroll → heads-up once a
+   CPU busts). Core logic verified headlessly (side-pot math + a 300-session
+   random-action stress test for chip conservation / termination) before
+   wiring up this UI — see scratchpad/betting-engine-full.js.
+   ===================================================================== */
+const ALL_KEYS = ['you','cpu1','cpu2'];
+const PLAYER_NAMES = {you:'あなた', cpu1:'CPU A', cpu2:'CPU B'};
+const SB_AMOUNT = 10, BB_AMOUNT = 20, TARGET_HANDS = 5, START_STACK = 1000;
+const STREET_LABEL = {preflop:'プリフロップ', flop:'フロップ', turn:'ターン', river:'リバー'};
+
+function computePots(committed, foldedSet, aliveKeys){
+  const keys = aliveKeys.filter(k=>committed[k]>0);
+  const levels = [...new Set(keys.map(k=>committed[k]))].sort((a,b)=>a-b);
+  let prevLevel = 0;
+  const pots = [];
+  levels.forEach(level=>{
+    const contributors = keys.filter(k=>committed[k]>=level);
+    const tierAmount = (level - prevLevel) * contributors.length;
+    if(tierAmount>0){
+      const eligible = contributors.filter(k=>!foldedSet.has(k));
+      if(eligible.length>0) pots.push({amount:tierAmount, eligible});
+      else if(pots.length>0) pots[pots.length-1].amount += tierAmount;
+      else pots.push({amount:tierAmount, eligible:[]});
+    }
+    prevLevel = level;
+  });
+  return pots;
+}
+
 function buildFinal(root, ctx){
-  const TOTAL_HANDS = 3;
-  let handIndex = 0;
-  const results = [];
+  let bankroll, btnKey, handsPlayed, H, log, gameOver;
 
-  function playHand(){
-    const deck = shuffleArr(freshDeck());
-    const playerHole = [deck.pop(), deck.pop()];
-    const cpuHole = [deck.pop(), deck.pop()];
-    const board = [deck.pop(),deck.pop(),deck.pop(),deck.pop(),deck.pop()];
-    let street = 'flop';
+  function playersAlive(){ return ALL_KEYS.filter(k=>bankroll[k]>0); }
 
-    function currentBoard(){ return street==='flop' ? board.slice(0,3) : board.slice(0,4); }
-
-    function renderDecision(){
-      const shownBoard = currentBoard();
-      const madeBest = bestOf([...playerHole, ...shownBoard]);
-      root.innerHTML = `
-        ${ctx.missionBoxHtml}
-        <div class="table-felt">
-          <div class="pot-label">🪙 ポット: 100 ／ ハンド ${handIndex+1} / ${TOTAL_HANDS}</div>
-          <div class="hand-block"><div class="hand-label">あなたのホールカード</div><div class="hand-row">${playerHole.map(cardHtml).join('')}</div></div>
-          <div class="hand-block"><div class="hand-label">${street==='flop'?'フロップ':'ターン'}</div><div class="hand-row">${shownBoard.map(cardHtml).join('')}</div></div>
-          <div class="made-hand">現在の最強の役: <b>${catDisplayName(madeBest.eval)}</b></div>
-          <div class="choice-list">
-            <button class="btn" id="btn-fold">🏳️ フォールド(降りる)</button>
-            <button class="btn btn-primary" id="btn-continue">▶ 勝負を続ける</button>
-          </div>
-        </div>`;
-      linkGlossaryIn(root);
-      qs('#btn-fold', root).addEventListener('click', ()=> finishHand('fold'));
-      qs('#btn-continue', root).addEventListener('click', ()=>{
-        if(street==='flop'){ street='turn'; renderDecision(); }
-        else { showdown(); }
-      });
-    }
-
-    function showdown(){
-      const pBest = bestOf([...playerHole, ...board]);
-      const cBest = bestOf([...cpuHole, ...board]);
-      const cmp = compareEval(pBest.eval, cBest.eval);
-      const outcome = cmp>0 ? 'win' : cmp<0 ? 'lose' : 'tie';
-      root.innerHTML = `
-        ${ctx.missionBoxHtml}
-        <div class="table-felt">
-          <div class="pot-label">🪙 ショウダウン ／ ハンド ${handIndex+1} / ${TOTAL_HANDS}</div>
-          <div class="hand-block"><div class="hand-label">あなたのホールカード</div><div class="hand-row">${playerHole.map(cardHtml).join('')}</div></div>
-          <div class="hand-block"><div class="hand-label">CPUのホールカード</div><div class="hand-row">${cpuHole.map(cardHtml).join('')}</div></div>
-          <div class="hand-block"><div class="hand-label">ボード</div><div class="hand-row">${board.map(cardHtml).join('')}</div></div>
-          <div class="made-hand">あなた: <b>${catDisplayName(pBest.eval)}</b> ／ CPU: <b>${catDisplayName(cBest.eval)}</b></div>
-          <div class="showdown-result ${outcome}">${outcome==='win'?'🎉 あなたの勝ち！':outcome==='lose'?'😢 CPUの勝ち…':'🤝 引き分け'}</div>
-          <div class="choice-list"><button class="btn btn-primary" id="btn-nexthand">次へ ▶</button></div>
-        </div>`;
-      linkGlossaryIn(root);
-      qs('#btn-nexthand', root).addEventListener('click', ()=> finishHand(outcome));
-    }
-
-    function finishHand(outcome){
-      results.push(outcome);
-      handIndex++;
-      if(handIndex>=TOTAL_HANDS) showSummary();
-      else playHand();
-    }
-
-    renderDecision();
+  function initSession(){
+    bankroll = {you:START_STACK, cpu1:START_STACK, cpu2:START_STACK};
+    btnKey = 'you';
+    handsPlayed = 0;
+    gameOver = false;
+    startNewHand();
   }
 
-  function showSummary(){
-    const wins = results.filter(r=>r==='win').length;
-    const loses = results.filter(r=>r==='lose').length;
-    const ties = results.filter(r=>r==='tie').length;
-    const folds = results.filter(r=>r==='fold').length;
+  function startNewHand(){
+    const alive = playersAlive();
+    const n = alive.length;
+    let sbKey, bbKey;
+    if(n===3){
+      const bi = alive.indexOf(btnKey);
+      sbKey = alive[(bi+1)%3]; bbKey = alive[(bi+2)%3];
+    } else {
+      sbKey = btnKey; bbKey = alive.find(k=>k!==btnKey); // heads-up: BTN posts SB, acts first preflop
+    }
+    const deck = shuffleArr(freshDeck());
+    const hole = {};
+    alive.forEach(k=> hole[k]=[deck.pop(), deck.pop()]);
+    const committed = {you:0,cpu1:0,cpu2:0};
+    const folded = new Set();
+    const allIn = new Set();
+    const stackOf = k => bankroll[k]-committed[k];
+    const post = (k,amt)=>{ const pay=Math.min(amt, stackOf(k)); committed[k]+=pay; if(stackOf(k)===0) allIn.add(k); };
+    post(sbKey, SB_AMOUNT); post(bbKey, BB_AMOUNT);
+    H = {
+      alive, n, btnKey, sbKey, bbKey, hole, board:[], deck, committed, folded, allIn,
+      street:'preflop',
+      streetCommitted: {you:committed.you, cpu1:committed.cpu1, cpu2:committed.cpu2},
+      currentBet: Math.max(committed[sbKey], committed[bbKey]),
+      order: n===3 ? [btnKey, sbKey, bbKey] : [sbKey, bbKey],
+      turnPtr: 0,
+      acted: new Set(),
+    };
+    log = [`ハンド${handsPlayed+1}開始。${PLAYER_NAMES[sbKey]}がSB(${committed[sbKey]})、${PLAYER_NAMES[bbKey]}がBB(${committed[bbKey]})を払った。`];
+    step();
+  }
+
+  function activeKeys(){ return H.alive.filter(k=>!H.folded.has(k)); }
+  function playableKeys(){ return activeKeys().filter(k=>!H.allIn.has(k)); }
+  function stackOf(k){ return bankroll[k]-H.committed[k]; }
+
+  function streetResolved(){
+    const remaining = playableKeys();
+    if(activeKeys().length<=1) return true;
+    if(remaining.length===0) return true;
+    return remaining.every(k=>H.streetCommitted[k]===H.currentBet) && remaining.every(k=>H.acted.has(k));
+  }
+
+  function potAfterCall(key){
+    const toCall = H.currentBet - H.streetCommitted[key];
+    return ALL_KEYS.reduce((s,k)=>s+H.committed[k],0) + Math.max(toCall,0);
+  }
+
+  function applyAction(key, decision){
+    const stack = stackOf(key);
+    const toCall = H.currentBet - H.streetCommitted[key];
+    if(decision.action==='fold'){ H.folded.add(key); H.acted.add(key); return `${PLAYER_NAMES[key]}: 🏳️ フォールド`; }
+    if(decision.action==='check'){ H.acted.add(key); return `${PLAYER_NAMES[key]}: ✅ チェック`; }
+    if(decision.action==='call'){
+      const pay = Math.min(toCall, stack);
+      H.committed[key]+=pay; H.streetCommitted[key]+=pay;
+      if(stackOf(key)===0) H.allIn.add(key);
+      H.acted.add(key);
+      return `${PLAYER_NAMES[key]}: 📞 コール(${pay})`;
+    }
+    const desiredAdd = Math.round(potAfterCall(key) * decision.size);
+    const desiredStreetTotal = H.streetCommitted[key] + toCall + desiredAdd;
+    const maxStreetTotal = stack + H.streetCommitted[key];
+    const newStreetTotal = Math.min(desiredStreetTotal, maxStreetTotal);
+    const pay = newStreetTotal - H.streetCommitted[key];
+    H.committed[key]+=pay; H.streetCommitted[key]+=pay;
+    H.currentBet = newStreetTotal;
+    if(stackOf(key)===0) H.allIn.add(key);
+    H.acted.clear(); H.acted.add(key);
+    const verb = decision.action==='bet' ? 'ベット' : 'レイズ';
+    return `${PLAYER_NAMES[key]}: ⬆️ ${verb}(${pay}) 合計${newStreetTotal}${stackOf(key)===0?'・オールイン':''}`;
+  }
+
+  function cpuDecide(key){
+    const stack = stackOf(key);
+    const toCall = H.currentBet - H.streetCommitted[key];
+    let strength;
+    if(H.board.length===0){
+      const [a,b] = H.hole[key];
+      const hi=Math.max(a.rank,b.rank), lo=Math.min(a.rank,b.rank);
+      let s = hi/14*0.6;
+      if(a.rank===b.rank) s += 0.35;
+      if(a.suit===b.suit) s += 0.08;
+      if(hi-lo<=2) s += 0.05;
+      strength = Math.min(s,1);
+    } else {
+      strength = bestOf([...H.hole[key], ...H.board]).eval.cat/8;
+    }
+    if(Math.random()<0.12) strength = Math.min(strength+0.4, 1); // occasional bluff
+    const potNow = ALL_KEYS.reduce((s,k)=>s+H.committed[k],0);
+    if(toCall<=0){
+      if(strength>0.55 && Math.random()<0.65 && stack>0) return {action:'bet', size: Math.random()<0.5?0.5:1};
+      return {action:'check'};
+    }
+    if(stack<=toCall){
+      return (strength>0.15 || toCall <= 0.15*potNow) ? {action:'call'} : {action:'fold'};
+    }
+    if(strength<0.22 && toCall > 0.12*potNow) return {action:'fold'};
+    if(strength>0.62 && stack>toCall && Math.random()<0.5) return {action:'raise', size: Math.random()<0.5?0.5:1};
+    return {action:'call'};
+  }
+
+  function youOptions(){
+    const toCall = H.currentBet - H.streetCommitted.you;
+    const stack = stackOf('you');
+    const opts = [];
+    if(toCall<=0){
+      opts.push({label:'✅ チェック', decision:{action:'check'}});
+      if(stack>0){
+        [0.5,1].forEach(size=>{
+          const amt = Math.min(Math.round(potAfterCall('you')*size), stack);
+          opts.push({label:`💰 ベット: ${size===0.5?'1/2ポット':'ポット'} (${amt})`, decision:{action:'bet', size}});
+        });
+      }
+    } else {
+      const callAmt = Math.min(toCall, stack);
+      opts.push({label:'🏳️ フォールド', decision:{action:'fold'}});
+      opts.push({label: callAmt<toCall ? `📞 オールイン・コール(${callAmt})` : `📞 コール(${callAmt})`, decision:{action:'call'}});
+      if(stack>toCall){
+        [0.5,1].forEach(size=>{
+          const amt = Math.min(H.streetCommitted.you+toCall+Math.round(potAfterCall('you')*size), stack+H.streetCommitted.you) - H.streetCommitted.you;
+          opts.push({label:`⬆️ レイズ: ${size===0.5?'1/2ポット':'ポット'} (合計${H.streetCommitted.you+amt})`, decision:{action:'raise', size}});
+        });
+      }
+    }
+    return opts;
+  }
+
+  function nextStreetName(s){ return {preflop:'flop', flop:'turn', turn:'river'}[s]; }
+  function dealCount(s){ return {preflop:3, flop:1, turn:1}[s]; }
+
+  function step(){
+    if(activeKeys().length<=1){ resolveFoldOut(); return; }
+    if(streetResolved()){
+      if(H.street==='river' || playableKeys().length<=1){ resolveShowdown(); return; }
+      const nxt = nextStreetName(H.street);
+      for(let i=0;i<dealCount(H.street);i++) H.board.push(H.deck.pop());
+      H.street = nxt;
+      H.streetCommitted = {you:0,cpu1:0,cpu2:0};
+      H.currentBet = 0;
+      H.acted = new Set();
+      H.order = H.n===3 ? [H.sbKey, H.bbKey, H.btnKey] : [H.bbKey, H.sbKey];
+      H.turnPtr = 0;
+      log.push(`── ${STREET_LABEL[H.street]} ──`);
+      render({paused:true});
+      return;
+    }
+    let k;
+    for(let tries=0; tries<10; tries++){
+      const cand = H.order[H.turnPtr % H.order.length];
+      H.turnPtr++;
+      if(!H.folded.has(cand) && !H.allIn.has(cand)){ k = cand; break; }
+    }
+    if(k==='you'){ render({paused:false}); return; }
+    const decision = cpuDecide(k);
+    log.push(applyAction(k, decision));
+    render({paused:true});
+  }
+
+  function resolveFoldOut(){
+    const winner = activeKeys()[0];
+    const pots = computePots(H.committed, H.folded, H.alive);
+    ALL_KEYS.forEach(k=> bankroll[k]-=H.committed[k]);
+    pots.forEach(p=>{ if(p.eligible.length) bankroll[p.eligible[0]]+=p.amount; });
+    log.push(`${PLAYER_NAMES[winner]}以外が全員フォールド。${PLAYER_NAMES[winner]}がポットを獲得。`);
+    afterHandEnds({folded:true, winner});
+  }
+
+  function resolveShowdown(){
+    while(H.board.length<5) H.board.push(H.deck.pop());
+    const evals = {};
+    activeKeys().forEach(k=> evals[k]=bestOf([...H.hole[k], ...H.board]).eval);
+    const pots = computePots(H.committed, H.folded, H.alive);
+    ALL_KEYS.forEach(k=> bankroll[k]-=H.committed[k]);
+    const potResults = [];
+    pots.forEach(p=>{
+      if(!p.eligible.length) return;
+      let best=null, winners=[];
+      p.eligible.forEach(k=>{
+        if(!best || compareEval(evals[k],best)>0){ best=evals[k]; winners=[k]; }
+        else if(compareEval(evals[k],best)===0){ winners.push(k); }
+      });
+      const share = Math.floor(p.amount/winners.length);
+      winners.forEach(w=> bankroll[w]+=share);
+      bankroll[winners[0]] += p.amount - share*winners.length;
+      potResults.push({amount:p.amount, winners});
+    });
+    afterHandEnds({folded:false, evals, potResults});
+  }
+
+  function afterHandEnds(resultInfo){
+    handsPlayed++;
+    render({paused:true, resultInfo});
+  }
+
+  function seatHtml(key, isTurn, reveal){
+    const alive = bankroll[key]>0;
+    const cls = ['cpu-seat'];
+    if(key==='you') cls.push('you');
+    if(H.folded.has(key)) cls.push('folded');
+    if(isTurn) cls.push('turn');
+    const posTag = key===H.btnKey ? 'BTN' : key===H.sbKey ? 'SB' : key===H.bbKey ? 'BB' : '';
+    const showFace = key==='you' || (reveal && !H.folded.has(key));
+    const cardsHtml = (!alive || H.folded.has(key)) ? '' : (H.hole[key]||[]).map(c=> showFace ? cardHtml(c) : '<div class="pcard back"></div>').join('');
+    const tag = H.folded.has(key) ? '<span class="cpu-seat-tag fold">フォールド</span>'
+      : H.allIn.has(key) ? '<span class="cpu-seat-tag allin">オールイン</span>' : '';
+    const betAmt = H.streetCommitted[key]>0 ? `🪙${H.streetCommitted[key]}` : '';
+    return `<div class="${cls.join(' ')}">
+      <div class="cpu-seat-name">${PLAYER_NAMES[key]}${posTag?`<span class="cpu-seat-pos">${posTag}</span>`:''}</div>
+      <div class="cpu-seat-stack">${alive ? `残り ${bankroll[key]}` : '💥 チップ切れ'}</div>
+      <div class="cpu-seat-cards">${cardsHtml}</div>
+      <div>${tag}</div>
+      <div class="cpu-seat-bet">${betAmt}</div>
+    </div>`;
+  }
+
+  function render(opts){
+    opts = opts || {};
+    const turnKey = (!opts.resultInfo && !opts.paused) ? 'you' : null;
+    const potNow = ALL_KEYS.reduce((s,k)=>s+H.committed[k],0);
+    const reveal = !!(opts.resultInfo && !opts.resultInfo.folded);
+    const seatsHtml = ALL_KEYS.filter(k=> H.alive.includes(k)).map(k=> seatHtml(k, turnKey===k, reveal)).join('');
+
+    let controlsHtml = '';
+    if(opts.resultInfo){
+      const r = opts.resultInfo;
+      let summary;
+      if(r.folded){
+        summary = `<div class="made-hand">🏁 ${PLAYER_NAMES[r.winner]}の勝ち(不戦勝) ／ ポット ${potNow}</div>`;
+      } else {
+        const lines = activeKeys().map(k=> `${PLAYER_NAMES[k]}: <b>${catDisplayName(r.evals[k])}</b>`).join(' ／ ');
+        const potLines = r.potResults.map((p,i)=> `${r.potResults.length>1?`第${i+1}ポット`:'ポット'} ${p.amount} → ${p.winners.map(w=>PLAYER_NAMES[w]).join('・')}`).join('<br>');
+        summary = `<div class="made-hand">${lines}</div><div class="made-hand">${potLines}</div>`;
+      }
+      let shouldComplete = false;
+      if(bankroll.you<=0){
+        gameOver = true;
+        controlsHtml = `<p class="step-note">資金が尽きた。ここまでの駆け引き、次はきっと活かせる。</p>
+          <div class="choice-list"><button class="btn btn-primary" id="btn-retry-session">↺ もう一度挑戦する</button></div>`;
+      } else if(bankroll.cpu1<=0 && bankroll.cpu2<=0){
+        gameOver = true; shouldComplete = true;
+        controlsHtml = `<p class="step-note">CPU全員をチップ切れに追い込んだ！お題は達成済み。下の「クリア画面へ」から進めるよ。</p>`;
+      } else if(handsPlayed>=TARGET_HANDS){
+        gameOver = true; shouldComplete = true;
+        controlsHtml = `<p class="step-note">目標の${TARGET_HANDS}ハンドを資金を残して生き残った！お題は達成済み。下の「クリア画面へ」から進めるよ。</p>`;
+      } else {
+        controlsHtml = `<div class="choice-list"><button class="btn btn-primary" id="btn-next-hand">次のハンドへ ▶</button></div>`;
+      }
+      root.innerHTML = `
+        ${ctx.missionBoxHtml}
+        <div class="table-felt">
+          <div class="hand-progress">ハンド ${handsPlayed} / ${TARGET_HANDS}</div>
+          <div class="cpu-seats">${seatsHtml}</div>
+          <div class="hand-block"><div class="hand-label">ボード</div><div class="hand-row">${H.board.map(cardHtml).join('')}</div></div>
+          ${summary}
+          ${controlsHtml}
+          <div class="action-log">${log.map(escapeHtml).join('<br>')}</div>
+        </div>`;
+      linkGlossaryIn(root);
+      // ctx.complete() mutates the live #mission-status node — must run AFTER
+      // root.innerHTML is set, since ${ctx.missionBoxHtml} above is a fixed
+      // string captured at mount time and would otherwise overwrite the
+      // "達成！" text back to "未達成" on this very render.
+      if(shouldComplete) ctx.complete();
+      qs('#btn-next-hand', root)?.addEventListener('click', ()=>{ const alive=playersAlive(); const bi=alive.indexOf(btnKey); btnKey = bi===-1? alive[0] : alive[(bi+1)%alive.length]; startNewHand(); });
+      qs('#btn-retry-session', root)?.addEventListener('click', initSession);
+      return;
+    }
+
+    let bottomHtml;
+    if(turnKey==='you'){
+      const opts2 = youOptions();
+      bottomHtml = `<div class="choice-list">${opts2.map((o,i)=>`<button class="btn btn-primary" data-oi="${i}">${o.label}</button>`).join('')}</div>`;
+    } else {
+      bottomHtml = `<div class="choice-list"><button class="btn btn-primary" id="btn-step-next">次へ ▶</button></div>`;
+    }
     root.innerHTML = `
       ${ctx.missionBoxHtml}
       <div class="table-felt">
-        <div class="pot-label">🏁 全${TOTAL_HANDS}ハンド終了</div>
-        <div class="made-hand">勝ち ${wins} ／ 負け ${loses} ／ 引き分け ${ties} ／ フォールド ${folds}</div>
-        <p class="step-note">役の見極め、ドローの見込み、無理をしない判断——ここまで学んだ知識を活かせたかな？</p>
+        <div class="hand-progress">ハンド ${handsPlayed+1} / ${TARGET_HANDS} ・ ${STREET_LABEL[H.street]} ・ ポット ${potNow}</div>
+        <div class="cpu-seats">${seatsHtml}</div>
+        <div class="hand-block"><div class="hand-label">ボード</div><div class="hand-row">${H.board.map(cardHtml).join('') || '<span class="hint">(まだ公開なし)</span>'}</div></div>
+        ${bottomHtml}
+        <div class="action-log">${log.map(escapeHtml).join('<br>')}</div>
       </div>`;
     linkGlossaryIn(root);
-    ctx.complete();
+    if(turnKey==='you'){
+      const opts2 = youOptions();
+      root.querySelectorAll('[data-oi]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const o = opts2[Number(btn.dataset.oi)];
+          log.push(applyAction('you', o.decision));
+          step();
+        });
+      });
+    } else {
+      qs('#btn-step-next', root)?.addEventListener('click', step);
+    }
   }
 
-  playHand();
+  initSession();
 }
 
 /* =====================================================================
@@ -555,12 +836,12 @@ function buildFinal(root, ctx){
    ===================================================================== */
 const STAGES = [
   {
-    key:'challenge', title:'総合チャレンジ：CPU対戦', sub:'学んだ知識を武器に3ハンド勝負',
-    missionText:'CPU相手に3ハンド勝負しよう。役の見極めとフォールド判断を実践してみよう。',
+    key:'challenge', title:'総合チャレンジ：CPU対戦', sub:'持ちチップで2人のCPUと駆け引きする',
+    missionText:`あなたとCPU2人、3人ともチップ${START_STACK}スタート。チェック・ベット・コール・レイズ・フォールドを使い分けて${TARGET_HANDS}ハンド生き残るか、CPU2人を両方ともチップ切れにすればクリア。`,
     dialogue:[
-      {who:'coach', text:'「戦略編」で学んだ知識を総動員する最終試練だ。CPU相手に3ハンド勝負してもらう。'},
-      {who:'stu', text:'緊張します…！自分の役をちゃんと見極めて、必要なら降りる勇気も持たないと。'},
-      {who:'coach', text:'その意識が一番大事だ。役の強さ、ドローの見込み、無理をしない判断——全部使って挑んでみよう！'},
+      {who:'coach', text:'「戦略編」で学んだ知識を総動員する最終試練だ。今回はCPU2人との3人卓。しかもポットは毎回リセットされない——最初に配られたチップを、複数ハンドにわたって守り育てていく。'},
+      {who:'stu', text:'ハンドごとにチップが引き継がれるんですね…負けが込むと本当になくなっちゃう。'},
+      {who:'coach', text:'そうだ。だからこそ毎ハンドの判断が重い。チェック・ベット・コール・レイズ・フォールドを駆使して、ブラインドやポジション、レンジ、ベットサイジングまで、ここまでの知識を全部使って挑んでみよう！'},
     ],
     build: buildFinal,
   },
@@ -684,7 +965,7 @@ function showEnding(){
   main.innerHTML = `
     <div class="ending">
       <h2>⚔️ 総合チャレンジ 制覇！</h2>
-      <p>CPU相手に3ハンド戦い抜いた。役の見極め、ポットオッズ、ポジション、レンジ、ブロッカー、ベットサイジングの数学——「戦略編」で学んだ知識を実戦で活かす感覚はつかめたかな？</p>
+      <p>CPU2人との持ちチップ勝負を戦い抜いた。ベット・コール・レイズ・フォールドの駆け引き、ポジション、レンジ、ベットサイジングの数学——「戦略編」で学んだ知識を実戦で活かす感覚はつかめたかな？</p>
       <div class="choice-list" style="justify-content:center">
         <a class="btn btn-primary" href="index.html">📖 戦略編に戻る</a>
         <a class="btn" href="https://ruglerugle.github.io/">🧭 クエスト集トップへ</a>
