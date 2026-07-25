@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POKER QUEST ― テキサスホールデムを学ぶ地図 ―</title>
-<meta name="description" content="役の見分け方から実戦の駆け引きまで、テキサスホールデムを3つのクエストで学べる無料ブラウザ学習ゲーム。ルール編・戦略編・総合チャレンジ。">
+<title>ギャンブラーのための数学(ポーカー編) ― POKER QUEST ―</title>
+<meta name="description" content="役の見分け方から実戦の駆け引き、世界大会への挑戦まで。ギャンブラーのための数学をテキサスホールデムで学べる無料ブラウザ学習ゲーム。ルール編・戦略編・総合チャレンジ・世界大会ガイドの4クエスト。">
 <style>
   :root{
     --bg0:#080b16;
@@ -69,14 +69,14 @@
   .map{
     position:relative;
     width:100%;
-    aspect-ratio:5/3.1;
+    aspect-ratio:100/84;
     border-radius:14px;
     overflow:hidden;
     background:
-      radial-gradient(240px 190px at 10% 14%, rgba(94,200,255,.16), transparent 70%),
-      radial-gradient(240px 190px at 36% 35%, rgba(126,224,127,.15), transparent 70%),
-      radial-gradient(240px 190px at 64% 58%, rgba(240,149,95,.16), transparent 70%),
-      radial-gradient(240px 190px at 90% 80%, rgba(180,140,255,.17), transparent 70%),
+      radial-gradient(220px 190px at 13% 14%, rgba(94,200,255,.16), transparent 70%),
+      radial-gradient(220px 190px at 84% 21%, rgba(126,224,127,.15), transparent 70%),
+      radial-gradient(220px 190px at 80% 58%, rgba(240,149,95,.16), transparent 70%),
+      radial-gradient(220px 190px at 15% 82%, rgba(180,140,255,.17), transparent 70%),
       linear-gradient(160deg,#0b1122,#131c33 55%,#0b1122);
   }
   .map svg.terrain{position:absolute;inset:0;width:100%;height:100%}
@@ -96,7 +96,7 @@
   .trail-glow{fill:none;stroke:var(--gold);stroke-width:.9;opacity:.25;filter:blur(2px)}
   .trail{fill:none;stroke:var(--gold);stroke-width:.55;stroke-linecap:round;stroke-dasharray:2.2 2.6;opacity:.85}
 
-  .flag{position:absolute;left:10%;top:14%;transform:translate(-50%,-100%);font-size:26px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+  .flag{position:absolute;left:13%;top:14%;transform:translate(-50%,-100%);font-size:26px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
   .flag .label{position:absolute;top:100%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:var(--gold);letter-spacing:.1em;margin-top:2px}
 
   .node{
@@ -141,12 +141,13 @@
     box-shadow:0 0 0 4px rgba(8,11,22,.55), 0 0 26px 2px var(--accent), 0 10px 16px -6px rgba(0,0,0,.7);
   }
 
-  /* Node position presets (4-stop trail, top-left → bottom-right:
-     rules → strategy → challenge → world guide) */
-  .n1{left:10%; top:14%}
-  .n2{left:36%; top:35%}
-  .n3{left:64%; top:58%}
-  .n4{left:90%; top:80%}
+  /* Node position presets — snake/zigzag trail so it stays readable on
+     narrow screens: top row left→right (rules → strategy), wraps down
+     the right edge, then bottom row right→left (challenge → world guide) */
+  .n1{left:13%; top:14%}
+  .n2{left:84%; top:21%}
+  .n3{left:80%; top:58%}
+  .n4{left:15%; top:82%}
 
   .compass{position:absolute;top:14px;right:16px;width:44px;height:44px;opacity:.75}
 
@@ -211,7 +212,7 @@
 
   <header>
     <span class="eyebrow">FREE BROWSER POKER GAME</span>
-    <h1>🃏 POKER QUEST</h1>
+    <h1>🃏 ギャンブラーのための数学<br>(ポーカー編)</h1>
     <p>役の見分け方から実戦の駆け引き、世界大会への挑戦まで。地図をたどって、テキサスホールデムを4つのクエストで学ぼう。</p>
   </header>
 
@@ -220,22 +221,22 @@
 
       <div class="grid-lines"></div>
 
-      <svg class="terrain" viewBox="0 0 100 60" preserveAspectRatio="none">
-        <path class="trail-glow" d="M10,8.4 C20,12 26,16 36,21 C44,25 52,29 64,34.8 C72,38.5 80,42.5 90,48"/>
-        <path class="trail" d="M10,8.4 C20,12 26,16 36,21 C44,25 52,29 64,34.8 C72,38.5 80,42.5 90,48"/>
+      <svg class="terrain" viewBox="0 0 100 84" preserveAspectRatio="none">
+        <path class="trail-glow" d="M13,12 C24,4 34,20 44,10 C54,0 62,16 70,9 C76,6 80,10 84,18 C92,26 94,38 88,44 C84,47 82,48 80,49 C68,58 60,44 52,54 C44,64 36,50 28,60 C22,66 18,68 15,69"/>
+        <path class="trail" d="M13,12 C24,4 34,20 44,10 C54,0 62,16 70,9 C76,6 80,10 84,18 C92,26 94,38 88,44 C84,47 82,48 80,49 C68,58 60,44 52,54 C44,64 36,50 28,60 C22,66 18,68 15,69"/>
       </svg>
 
       <!-- decorative scenery -->
-      <span class="deco" style="left:4%;top:8%" aria-hidden="true">🏘️</span>
-      <span class="deco" style="left:18%;top:24%" aria-hidden="true">♠️</span>
-      <span class="deco" style="left:26%;top:14%" aria-hidden="true">♥️</span>
-      <span class="deco" style="left:32%;top:44%" aria-hidden="true">🪙</span>
-      <span class="deco" style="left:42%;top:24%" aria-hidden="true">♦️</span>
-      <span class="deco" style="left:50%;top:46%" aria-hidden="true">♣️</span>
-      <span class="deco" style="left:56%;top:28%" aria-hidden="true">🍀</span>
-      <span class="deco" style="left:70%;top:68%" aria-hidden="true">💰</span>
-      <span class="deco" style="left:76%;top:44%" aria-hidden="true">🎩</span>
-      <span class="deco" style="left:96%;top:64%" aria-hidden="true">🌍</span>
+      <span class="deco" style="left:5%;top:6%" aria-hidden="true">🏘️</span>
+      <span class="deco" style="left:32%;top:8%" aria-hidden="true">♠️</span>
+      <span class="deco" style="left:52%;top:22%" aria-hidden="true">♥️</span>
+      <span class="deco" style="left:64%;top:8%" aria-hidden="true">🪙</span>
+      <span class="deco" style="left:94%;top:36%" aria-hidden="true">♦️</span>
+      <span class="deco" style="left:60%;top:40%" aria-hidden="true">♣️</span>
+      <span class="deco" style="left:44%;top:52%" aria-hidden="true">🍀</span>
+      <span class="deco" style="left:64%;top:66%" aria-hidden="true">💰</span>
+      <span class="deco" style="left:34%;top:72%" aria-hidden="true">🎩</span>
+      <span class="deco" style="left:5%;top:60%" aria-hidden="true">🌍</span>
 
       <div class="flag" aria-hidden="true">🚩<span class="label">START</span></div>
 
