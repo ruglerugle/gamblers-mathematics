@@ -193,25 +193,44 @@ a.head-reset{text-decoration:none;display:inline-flex;align-items:center}
 .table-felt .step-note{color:#e5f2eb}
 .pcard.back{background:repeating-linear-gradient(45deg,var(--felt),var(--felt) 4px,var(--felt-dark) 4px,var(--felt-dark) 8px);border-color:rgba(255,255,255,.35)}
 
-/* Multi-seat betting table (persistent bankroll, 3-handed → heads-up) */
-.cpu-seats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
-.cpu-seat{background:rgba(0,0,0,.22);border-radius:10px;padding:10px 12px;min-width:126px;text-align:center;transition:opacity .2s}
-.cpu-seat.folded{opacity:.4}
-.cpu-seat.you{background:rgba(217,164,65,.22);border:1px solid var(--gold)}
-.cpu-seat.turn{outline:2px dashed #f3d99a;box-shadow:0 0 0 4px rgba(243,217,154,.18)}
-.cpu-seat-name{color:#fff;font-size:12px;font-weight:900;margin-bottom:2px;display:flex;align-items:center;justify-content:center;gap:5px}
-.cpu-seat-pos{display:inline-block;font-size:9px;font-weight:950;color:#123;background:#e8c07f;border-radius:4px;padding:1px 5px}
-.cpu-seat-stack{color:#f3d99a;font-size:11px;font-weight:800;margin-bottom:6px}
-.cpu-seat-cards{display:flex;gap:3px;justify-content:center;margin-bottom:5px}
-.cpu-seat-cards .pcard{width:34px;height:47px;padding:2px 3px}
-.cpu-seat-cards .pcard-corner{font-size:9px}
-.cpu-seat-cards .pcard-suit-big{font-size:15px}
-.cpu-seat-tag{display:inline-block;font-size:9.5px;font-weight:950;color:#123;background:#8ef0b0;border-radius:5px;padding:1px 7px}
-.cpu-seat-tag.fold{background:#7a3530;color:#fff}
-.cpu-seat-tag.allin{background:#8b3fae;color:#fff}
-.cpu-seat-bet{font-size:10.5px;color:#a9c7be;margin-top:5px;min-height:14px}
-.action-log{font-size:12px;color:#e5f2eb;line-height:1.8;margin-top:12px;max-height:120px;overflow-y:auto;background:rgba(0,0,0,.2);border-radius:8px;padding:8px 10px}
-.hand-progress{color:#cfe4de;font-size:11.5px;font-weight:800;margin-bottom:6px}
+/* Round table (persistent bankroll, 5-handed → heads-up as players bust).
+   "you" is fixed at the bottom/front (angle=90°, nearest the viewer); the
+   4 CPU seats are fixed in their own screen spots too — only the BTN/SB/BB
+   tag on each seat rotates hand to hand, not the seat's screen position. */
+.hand-progress{color:#cfe4de;font-size:11.5px;font-weight:800;margin-bottom:8px;text-align:center}
+.poker-round-wrap{position:relative;width:100%;max-width:600px;aspect-ratio:1.15;margin:4px auto 14px}
+.poker-round-felt{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 100%);box-shadow:inset 0 0 30px rgba(0,0,0,.45)}
+.poker-round-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:70%}
+.poker-round-center .hand-row{justify-content:center;margin-bottom:6px}
+.poker-round-center .pcard{width:32px;height:44px;padding:2px 3px}
+.poker-round-center .pcard-corner{font-size:8px}
+.poker-round-center .pcard-suit-big{font-size:14px}
+.poker-round-pot{color:#f3d99a;font-size:13px;font-weight:950}
+.oval-seat{position:absolute;transform:translate(-50%,-50%);background:rgba(0,0,0,.28);border-radius:10px;padding:6px 8px;min-width:98px;max-width:112px;text-align:center;transition:opacity .2s}
+.oval-seat.folded{opacity:.4}
+.oval-seat.busted{opacity:.3}
+.oval-seat.you{background:rgba(217,164,65,.25);border:1px solid var(--gold);min-width:108px}
+.oval-seat.turn{outline:2px dashed #f3d99a;box-shadow:0 0 0 4px rgba(243,217,154,.2)}
+.oval-seat-name{color:#fff;font-size:11px;font-weight:900;margin-bottom:2px;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.oval-seat-pos{display:inline-block;font-size:8.5px;font-weight:950;color:#123;background:#e8c07f;border-radius:4px;padding:1px 4px}
+.oval-seat-stack{color:#f3d99a;font-size:10px;font-weight:800;margin-bottom:4px}
+.oval-seat-cards{display:flex;gap:2px;justify-content:center;margin-bottom:3px}
+.oval-seat-cards .pcard{width:26px;height:36px;padding:1px 2px}
+.oval-seat-cards .pcard-corner{font-size:7px}
+.oval-seat-cards .pcard-suit-big{font-size:11px}
+.oval-seat-tag{display:inline-block;font-size:8.5px;font-weight:950;color:#123;background:#8ef0b0;border-radius:5px;padding:1px 6px}
+.oval-seat-tag.fold{background:#7a3530;color:#fff}
+.oval-seat-tag.allin{background:#8b3fae;color:#fff}
+.oval-seat-bet{font-size:9.5px;color:#a9c7be;margin-top:3px;min-height:12px}
+.current-action-banner{text-align:center;font-size:13px;font-weight:800;color:#f3d99a;min-height:20px;margin-bottom:8px}
+@media(max-width:480px){
+  .oval-seat{min-width:74px;max-width:86px;padding:4px 5px}
+  .oval-seat.you{min-width:82px}
+  .oval-seat-name{font-size:9.5px}
+  .oval-seat-cards .pcard{width:20px;height:28px}
+  .oval-seat-cards .pcard-corner{font-size:6px}
+  .oval-seat-cards .pcard-suit-big{font-size:9px}
+}
 
 /* Ending */
 .ending{text-align:center;padding:20px 10px}
@@ -491,10 +510,54 @@ function renderDialogue(lines){
    random-action stress test for chip conservation / termination) before
    wiring up this UI — see scratchpad/betting-engine-full.js.
    ===================================================================== */
-const ALL_KEYS = ['you','cpu1','cpu2'];
-const PLAYER_NAMES = {you:'あなた', cpu1:'CPU A', cpu2:'CPU B'};
+const ALL_KEYS = ['you','cpu1','cpu2','cpu3','cpu4'];
+const PLAYER_NAMES = {you:'あなた', cpu1:'CPU A', cpu2:'CPU B', cpu3:'CPU C', cpu4:'CPU D'};
 const SB_AMOUNT = 10, BB_AMOUNT = 20, TARGET_HANDS = 5, START_STACK = 1000;
 const STREET_LABEL = {preflop:'プリフロップ', flop:'フロップ', turn:'ターン', river:'リバー'};
+// "you" fixed at the bottom/front (90°); the 4 CPU seats fixed clockwise
+// around the rest of the circle. Only the BTN/SB/BB/UTG/CO tag moves.
+const KEY_ANGLES = {you:90, cpu1:162, cpu2:234, cpu3:306, cpu4:18};
+const EXTRA_POS_LABELS = {1:['CO'], 2:['UTG','CO'], 3:['UTG','MP','CO']};
+
+// General n-handed action order (n = players still in this hand's seating,
+// i.e. alive.length). Preflop starts left of BB, ends at BB (the "option"
+// seat); postflop always starts at SB and ends at BTN. n===2 is the
+// heads-up special case: BTN also posts SB and acts first preflop, while
+// BB acts first postflop.
+function preflopOrder(alive, btnIdx, sbIdx, bbIdx, n){
+  if(n===2) return [alive[sbIdx], alive[bbIdx]];
+  const order=[];
+  for(let i=1;i<=n;i++) order.push(alive[(bbIdx+i)%n]);
+  return order;
+}
+function postflopOrder(alive, btnIdx, sbIdx, bbIdx, n){
+  if(n===2) return [alive[bbIdx], alive[sbIdx]];
+  const order=[];
+  for(let i=0;i<n;i++) order.push(alive[(sbIdx+i)%n]);
+  return order;
+}
+function positionTags(alive, btnIdx, sbIdx, bbIdx, n){
+  const tags = {};
+  alive.forEach(k=> tags[k]='');
+  tags[alive[btnIdx]] = 'BTN';
+  if(n>=2) tags[alive[sbIdx]] = n===2 ? 'BTN・SB' : 'SB';
+  if(n>=3) tags[alive[bbIdx]] = 'BB';
+  if(n===2){ tags[alive[bbIdx]] = 'BB'; return tags; }
+  const extras = [];
+  for(let i=1;i<=n;i++){
+    const k = alive[(bbIdx+i)%n];
+    if(k!==alive[btnIdx] && k!==alive[sbIdx] && k!==alive[bbIdx]) extras.push(k);
+  }
+  (EXTRA_POS_LABELS[extras.length]||[]).forEach((lab,i)=> tags[extras[i]]=lab);
+  return tags;
+}
+
+function ovalSeatStyle(key){
+  const rad = KEY_ANGLES[key] * Math.PI/180;
+  const x = 50 + 43*Math.cos(rad);
+  const y = 50 + 40*Math.sin(rad);
+  return `left:${x}%;top:${y}%`;
+}
 
 function computePots(committed, foldedSet, aliveKeys){
   const keys = aliveKeys.filter(k=>committed[k]>0);
@@ -516,12 +579,14 @@ function computePots(committed, foldedSet, aliveKeys){
 }
 
 function buildFinal(root, ctx){
-  let bankroll, btnKey, handsPlayed, H, log, gameOver;
+  let bankroll, btnKey, handsPlayed, H, lastActionMsg, gameOver;
 
   function playersAlive(){ return ALL_KEYS.filter(k=>bankroll[k]>0); }
+  function zeroMap(keys){ const m={}; keys.forEach(k=>m[k]=0); return m; }
 
   function initSession(){
-    bankroll = {you:START_STACK, cpu1:START_STACK, cpu2:START_STACK};
+    bankroll = zeroMap(ALL_KEYS);
+    ALL_KEYS.forEach(k=> bankroll[k]=START_STACK);
     btnKey = 'you';
     handsPlayed = 0;
     gameOver = false;
@@ -531,17 +596,14 @@ function buildFinal(root, ctx){
   function startNewHand(){
     const alive = playersAlive();
     const n = alive.length;
-    let sbKey, bbKey;
-    if(n===3){
-      const bi = alive.indexOf(btnKey);
-      sbKey = alive[(bi+1)%3]; bbKey = alive[(bi+2)%3];
-    } else {
-      sbKey = btnKey; bbKey = alive.find(k=>k!==btnKey); // heads-up: BTN posts SB, acts first preflop
-    }
+    const btnIdx = alive.indexOf(btnKey);
+    const sbIdx = n===2 ? btnIdx : (btnIdx+1)%n;
+    const bbIdx = n===2 ? (btnIdx+1)%2 : (btnIdx+2)%n;
+    const sbKey = alive[sbIdx], bbKey = alive[bbIdx];
     const deck = shuffleArr(freshDeck());
     const hole = {};
     alive.forEach(k=> hole[k]=[deck.pop(), deck.pop()]);
-    const committed = {you:0,cpu1:0,cpu2:0};
+    const committed = zeroMap(ALL_KEYS);
     const folded = new Set();
     const allIn = new Set();
     const stackOf = k => bankroll[k]-committed[k];
@@ -550,13 +612,14 @@ function buildFinal(root, ctx){
     H = {
       alive, n, btnKey, sbKey, bbKey, hole, board:[], deck, committed, folded, allIn,
       street:'preflop',
-      streetCommitted: {you:committed.you, cpu1:committed.cpu1, cpu2:committed.cpu2},
+      streetCommitted: {...committed},
       currentBet: Math.max(committed[sbKey], committed[bbKey]),
-      order: n===3 ? [btnKey, sbKey, bbKey] : [sbKey, bbKey],
+      order: preflopOrder(alive, btnIdx, sbIdx, bbIdx, n),
+      posTags: positionTags(alive, btnIdx, sbIdx, bbIdx, n),
       turnPtr: 0,
       acted: new Set(),
     };
-    log = [`ハンド${handsPlayed+1}開始。${PLAYER_NAMES[sbKey]}がSB(${committed[sbKey]})、${PLAYER_NAMES[bbKey]}がBB(${committed[bbKey]})を払った。`];
+    lastActionMsg = `ハンド${handsPlayed+1}開始。${PLAYER_NAMES[sbKey]}がSB(${committed[sbKey]})、${PLAYER_NAMES[bbKey]}がBB(${committed[bbKey]})を払った。`;
     step();
   }
 
@@ -666,12 +729,12 @@ function buildFinal(root, ctx){
       const nxt = nextStreetName(H.street);
       for(let i=0;i<dealCount(H.street);i++) H.board.push(H.deck.pop());
       H.street = nxt;
-      H.streetCommitted = {you:0,cpu1:0,cpu2:0};
+      H.streetCommitted = zeroMap(ALL_KEYS);
       H.currentBet = 0;
       H.acted = new Set();
-      H.order = H.n===3 ? [H.sbKey, H.bbKey, H.btnKey] : [H.bbKey, H.sbKey];
+      H.order = postflopOrder(H.alive, H.alive.indexOf(H.btnKey), H.alive.indexOf(H.sbKey), H.alive.indexOf(H.bbKey), H.n);
       H.turnPtr = 0;
-      log.push(`── ${STREET_LABEL[H.street]} ──`);
+      lastActionMsg = `── ${STREET_LABEL[H.street]} ──`;
       render({paused:true});
       return;
     }
@@ -683,7 +746,7 @@ function buildFinal(root, ctx){
     }
     if(k==='you'){ render({paused:false}); return; }
     const decision = cpuDecide(k);
-    log.push(applyAction(k, decision));
+    lastActionMsg = applyAction(k, decision);
     render({paused:true});
   }
 
@@ -692,7 +755,7 @@ function buildFinal(root, ctx){
     const pots = computePots(H.committed, H.folded, H.alive);
     ALL_KEYS.forEach(k=> bankroll[k]-=H.committed[k]);
     pots.forEach(p=>{ if(p.eligible.length) bankroll[p.eligible[0]]+=p.amount; });
-    log.push(`${PLAYER_NAMES[winner]}以外が全員フォールド。${PLAYER_NAMES[winner]}がポットを獲得。`);
+    lastActionMsg = `${PLAYER_NAMES[winner]}以外が全員フォールド。${PLAYER_NAMES[winner]}がポットを獲得。`;
     afterHandEnds({folded:true, winner});
   }
 
@@ -725,22 +788,24 @@ function buildFinal(root, ctx){
 
   function seatHtml(key, isTurn, reveal){
     const alive = bankroll[key]>0;
-    const cls = ['cpu-seat'];
+    const cls = ['oval-seat'];
     if(key==='you') cls.push('you');
-    if(H.folded.has(key)) cls.push('folded');
+    if(!alive) cls.push('busted');
+    else if(H.alive.includes(key) && H.folded.has(key)) cls.push('folded');
     if(isTurn) cls.push('turn');
-    const posTag = key===H.btnKey ? 'BTN' : key===H.sbKey ? 'SB' : key===H.bbKey ? 'BB' : '';
-    const showFace = key==='you' || (reveal && !H.folded.has(key));
-    const cardsHtml = (!alive || H.folded.has(key)) ? '' : (H.hole[key]||[]).map(c=> showFace ? cardHtml(c) : '<div class="pcard back"></div>').join('');
-    const tag = H.folded.has(key) ? '<span class="cpu-seat-tag fold">フォールド</span>'
-      : H.allIn.has(key) ? '<span class="cpu-seat-tag allin">オールイン</span>' : '';
-    const betAmt = H.streetCommitted[key]>0 ? `🪙${H.streetCommitted[key]}` : '';
-    return `<div class="${cls.join(' ')}">
-      <div class="cpu-seat-name">${PLAYER_NAMES[key]}${posTag?`<span class="cpu-seat-pos">${posTag}</span>`:''}</div>
-      <div class="cpu-seat-stack">${alive ? `残り ${bankroll[key]}` : '💥 チップ切れ'}</div>
-      <div class="cpu-seat-cards">${cardsHtml}</div>
+    const posTag = alive && H.alive.includes(key) ? (H.posTags[key]||'') : '';
+    const showFace = key==='you' || (reveal && H.alive.includes(key) && !H.folded.has(key));
+    const cardsHtml = (!alive || !H.alive.includes(key) || H.folded.has(key)) ? '' : (H.hole[key]||[]).map(c=> showFace ? cardHtml(c) : '<div class="pcard back"></div>').join('');
+    const tag = !alive ? ''
+      : H.folded.has(key) ? '<span class="oval-seat-tag fold">フォールド</span>'
+      : H.allIn.has(key) ? '<span class="oval-seat-tag allin">オールイン</span>' : '';
+    const betAmt = (alive && H.streetCommitted[key]>0) ? `🪙${H.streetCommitted[key]}` : '';
+    return `<div class="${cls.join(' ')}" style="${ovalSeatStyle(key)}">
+      <div class="oval-seat-name">${PLAYER_NAMES[key]}${posTag?`<span class="oval-seat-pos">${posTag}</span>`:''}</div>
+      <div class="oval-seat-stack">${alive ? `残り ${bankroll[key]}` : '💥 チップ切れ'}</div>
+      <div class="oval-seat-cards">${cardsHtml}</div>
       <div>${tag}</div>
-      <div class="cpu-seat-bet">${betAmt}</div>
+      <div class="oval-seat-bet">${betAmt}</div>
     </div>`;
   }
 
@@ -749,7 +814,11 @@ function buildFinal(root, ctx){
     const turnKey = (!opts.resultInfo && !opts.paused) ? 'you' : null;
     const potNow = ALL_KEYS.reduce((s,k)=>s+H.committed[k],0);
     const reveal = !!(opts.resultInfo && !opts.resultInfo.folded);
-    const seatsHtml = ALL_KEYS.filter(k=> H.alive.includes(k)).map(k=> seatHtml(k, turnKey===k, reveal)).join('');
+    const seatsHtml = ALL_KEYS.map(k=> seatHtml(k, turnKey===k, reveal)).join('');
+    const centerHtml = `<div class="poker-round-center">
+        <div class="hand-row">${H.board.map(cardHtml).join('') || ''}</div>
+        <div class="poker-round-pot">🪙 ポット ${potNow}</div>
+      </div>`;
 
     let controlsHtml = '';
     if(opts.resultInfo){
@@ -767,7 +836,7 @@ function buildFinal(root, ctx){
         gameOver = true;
         controlsHtml = `<p class="step-note">資金が尽きた。ここまでの駆け引き、次はきっと活かせる。</p>
           <div class="choice-list"><button class="btn btn-primary" id="btn-retry-session">↺ もう一度挑戦する</button></div>`;
-      } else if(bankroll.cpu1<=0 && bankroll.cpu2<=0){
+      } else if(ALL_KEYS.filter(k=>k!=='you').every(k=>bankroll[k]<=0)){
         gameOver = true; shouldComplete = true;
         controlsHtml = `<p class="step-note">CPU全員をチップ切れに追い込んだ！お題は達成済み。下の「クリア画面へ」から進めるよ。</p>`;
       } else if(handsPlayed>=TARGET_HANDS){
@@ -780,11 +849,9 @@ function buildFinal(root, ctx){
         ${ctx.missionBoxHtml}
         <div class="table-felt">
           <div class="hand-progress">ハンド ${handsPlayed} / ${TARGET_HANDS}</div>
-          <div class="cpu-seats">${seatsHtml}</div>
-          <div class="hand-block"><div class="hand-label">ボード</div><div class="hand-row">${H.board.map(cardHtml).join('')}</div></div>
+          <div class="poker-round-wrap"><div class="poker-round-felt"></div>${centerHtml}${seatsHtml}</div>
           ${summary}
           ${controlsHtml}
-          <div class="action-log">${log.map(escapeHtml).join('<br>')}</div>
         </div>`;
       linkGlossaryIn(root);
       // ctx.complete() mutates the live #mission-status node — must run AFTER
@@ -807,11 +874,10 @@ function buildFinal(root, ctx){
     root.innerHTML = `
       ${ctx.missionBoxHtml}
       <div class="table-felt">
-        <div class="hand-progress">ハンド ${handsPlayed+1} / ${TARGET_HANDS} ・ ${STREET_LABEL[H.street]} ・ ポット ${potNow}</div>
-        <div class="cpu-seats">${seatsHtml}</div>
-        <div class="hand-block"><div class="hand-label">ボード</div><div class="hand-row">${H.board.map(cardHtml).join('') || '<span class="hint">(まだ公開なし)</span>'}</div></div>
+        <div class="hand-progress">ハンド ${handsPlayed+1} / ${TARGET_HANDS} ・ ${STREET_LABEL[H.street]}</div>
+        <div class="poker-round-wrap"><div class="poker-round-felt"></div>${centerHtml}${seatsHtml}</div>
+        <div class="current-action-banner">${escapeHtml(lastActionMsg)}</div>
         ${bottomHtml}
-        <div class="action-log">${log.map(escapeHtml).join('<br>')}</div>
       </div>`;
     linkGlossaryIn(root);
     if(turnKey==='you'){
@@ -819,7 +885,7 @@ function buildFinal(root, ctx){
       root.querySelectorAll('[data-oi]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           const o = opts2[Number(btn.dataset.oi)];
-          log.push(applyAction('you', o.decision));
+          lastActionMsg = applyAction('you', o.decision);
           step();
         });
       });
@@ -836,10 +902,10 @@ function buildFinal(root, ctx){
    ===================================================================== */
 const STAGES = [
   {
-    key:'challenge', title:'総合チャレンジ：CPU対戦', sub:'持ちチップで2人のCPUと駆け引きする',
-    missionText:`あなたとCPU2人、3人ともチップ${START_STACK}スタート。チェック・ベット・コール・レイズ・フォールドを使い分けて${TARGET_HANDS}ハンド生き残るか、CPU2人を両方ともチップ切れにすればクリア。`,
+    key:'challenge', title:'総合チャレンジ：CPU対戦', sub:'持ちチップで4人のCPUと駆け引きする',
+    missionText:`あなたとCPU4人、5人ともチップ${START_STACK}スタート。チェック・ベット・コール・レイズ・フォールドを使い分けて${TARGET_HANDS}ハンド生き残るか、CPU4人を全員チップ切れにすればクリア。`,
     dialogue:[
-      {who:'coach', text:'「戦略編」で学んだ知識を総動員する最終試練だ。今回はCPU2人との3人卓。しかもポットは毎回リセットされない——最初に配られたチップを、複数ハンドにわたって守り育てていく。'},
+      {who:'coach', text:'「戦略編」で学んだ知識を総動員する最終試練だ。今回はCPU4人との5人卓。しかもポットは毎回リセットされない——最初に配られたチップを、複数ハンドにわたって守り育てていく。'},
       {who:'stu', text:'ハンドごとにチップが引き継がれるんですね…負けが込むと本当になくなっちゃう。'},
       {who:'coach', text:'そうだ。だからこそ毎ハンドの判断が重い。チェック・ベット・コール・レイズ・フォールドを駆使して、ブラインドやポジション、レンジ、ベットサイジングまで、ここまでの知識を全部使って挑んでみよう！'},
     ],
@@ -965,7 +1031,7 @@ function showEnding(){
   main.innerHTML = `
     <div class="ending">
       <h2>⚔️ 総合チャレンジ 制覇！</h2>
-      <p>CPU2人との持ちチップ勝負を戦い抜いた。ベット・コール・レイズ・フォールドの駆け引き、ポジション、レンジ、ベットサイジングの数学——「戦略編」で学んだ知識を実戦で活かす感覚はつかめたかな？</p>
+      <p>CPU4人との持ちチップ勝負を戦い抜いた。ベット・コール・レイズ・フォールドの駆け引き、ポジション、レンジ、ベットサイジングの数学——「戦略編」で学んだ知識を実戦で活かす感覚はつかめたかな？</p>
       <div class="choice-list" style="justify-content:center">
         <a class="btn btn-primary" href="index.html">📖 戦略編に戻る</a>
         <a class="btn" href="https://ruglerugle.github.io/">🧭 クエスト集トップへ</a>
