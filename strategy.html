@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POKER QUEST ― ポーカーの役とオッズを学ぶ ―</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{max-width:100vw;overflow-x:hidden}
+:root{
+  --bg1:#0d4b32;--bg2:#116b46;--bg3:#052015;
+  --paper:#f6f1e2;--paper2:#fffdf6;--ink:#241d12;--muted:#8a7a5c;--line:#ddd0ad;
+  --gold:#d9a441;--gold-dark:#a6742a;
+  --felt:#0f6b3f;--felt-dark:#083c23;
+  --ok:#2f9e5c;--ok-bg:#e6f5ec;--ok-bd:#8fd1ab;
+  --ng:#c8433f;--ng-bg:#fbe9e8;--ng-bd:#e79a97;
+  --cred:#c1443a;--cblack:#20241f;
+  --shadow:0 16px 40px rgba(0,0,0,.35);
+  --r:10px;--f:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;
+}
+body{font-family:var(--f);color:var(--ink);font-weight:600;min-height:100vh;
+  background:radial-gradient(circle at 20% 0%,var(--bg2) 0,var(--bg1) 40%,var(--bg3) 100%);}
+.app-shell{min-height:100vh;display:flex;flex-direction:column;gap:12px;padding:10px 12px 24px;}
+
+/* Header */
+.game-header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;color:#fff;padding:10px 16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.14));border-radius:12px;border:1px solid rgba(255,255,255,.15)}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:220px}
+.brand-title{font-size:22px;font-weight:950;letter-spacing:.02em;color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.brand-sub{font-size:12.5px;font-weight:800;color:#d9ece7}
+.head-progress-wrap{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
+.head-progress-label{font-size:11.5px;color:#cfe4de;font-weight:800}
+.head-progress{height:14px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.3)}
+.head-progress-fill{height:100%;width:0;background:linear-gradient(90deg,#f3c47a,var(--gold-dark));border-radius:999px;transition:width .4s}
+.head-reset{padding:9px 14px;border:1.5px solid rgba(255,255,255,.55);border-radius:8px;background:rgba(0,0,0,.2);color:#fff;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap}
+.head-reset:hover{background:rgba(255,255,255,.12)}
+a.head-reset{text-decoration:none;display:inline-flex;align-items:center}
+.head-reset.home-badge{width:38px;height:38px;padding:0;border-radius:50%;justify-content:center;background:radial-gradient(circle at 35% 30%, rgba(217,164,65,.5), rgba(10,40,38,1) 75%);border:1.5px solid var(--gold);box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 10px -2px var(--gold);font-size:18px}
+.head-reset.home-badge:hover{box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 16px 0 var(--gold);background:rgba(0,0,0,.12);transform:translateY(-2px) scale(1.07)}
+
+/* Header actions (home badge / reset / nav toggle) */
+.header-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+
+/* Layout — off-canvas drawer pattern shared with the other quest games */
+.game-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px;align-items:start;transition:grid-template-columns .25s ease}
+.side-backdrop{display:none}
+
+/* Sidebar */
+.side-panel{background:linear-gradient(180deg,rgba(17,107,70,.92),rgba(5,32,21,.95));border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;box-shadow:var(--shadow);overflow:hidden;position:sticky;top:10px;transition:width .25s ease}
+.side-head{padding:12px 14px;font-size:13px;font-weight:900;color:#eaf6f2;border-bottom:1px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;gap:8px;min-height:20px}
+.side-head-text{white-space:nowrap}
+.side-toggle{width:32px;height:28px;border:1px solid rgba(255,255,255,.28);border-radius:7px;background:rgba(255,255,255,.10);
+  color:#eaf6f2;font-weight:950;font-size:16px;cursor:pointer;line-height:1;flex-shrink:0}
+.side-list{display:flex;flex-direction:column}
+.side-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.09);
+  color:#c8ded7;cursor:pointer;user-select:none;touch-action:manipulation;min-width:0}
+.side-item:hover{background:rgba(255,255,255,.06)}
+.side-item.active{background:rgba(217,164,65,.2);box-shadow:inset 3px 0 0 var(--gold)}
+.side-item.locked{opacity:.45;cursor:not-allowed}
+.side-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.side-text{min-width:0}
+.side-main{font-size:12.5px;font-weight:900;line-height:1.3;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-sub{font-size:10.5px;color:#a9c7be;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* collapsed (icon-rail / off-canvas) state, toggled via #app-shell.side-collapsed */
+.app-shell.side-collapsed .game-layout{grid-template-columns:64px minmax(0,1fr)}
+.app-shell.side-collapsed .side-panel{width:64px}
+.app-shell.side-collapsed .side-head{justify-content:center;padding:8px 6px}
+.app-shell.side-collapsed .side-head-text{display:none}
+.app-shell.side-collapsed .side-item{justify-content:center;padding:11px 6px}
+.app-shell.side-collapsed .side-item .side-text{display:none}
+
+/* Desktop: sidebar always fully expanded regardless of toggle state */
+@media(min-width:901px){
+  .app-shell.side-collapsed .game-layout{grid-template-columns:230px minmax(0,1fr) !important}
+  .app-shell.side-collapsed .side-panel{width:auto !important}
+  .app-shell.side-collapsed .side-head{justify-content:space-between !important;padding:12px 14px !important}
+  .app-shell.side-collapsed .side-head-text{display:block !important}
+  .app-shell.side-collapsed .side-item{justify-content:flex-start !important;padding:11px 14px !important}
+  .app-shell.side-collapsed .side-item .side-text{display:block !important}
+}
+/* Tablet: collapsed = icon rail */
+@media(max-width:900px){
+  .game-layout{grid-template-columns:64px minmax(0,1fr);gap:8px}
+  .app-shell:not(.side-collapsed) .game-layout{grid-template-columns:210px minmax(0,1fr)}
+  .side-panel{position:sticky;top:8px}
+}
+/* Mobile: collapsed = fully hidden off-canvas drawer */
+@media(max-width:700px){
+  .game-layout{grid-template-columns:1fr}
+  .app-shell.side-collapsed .game-layout,
+  .app-shell:not(.side-collapsed) .game-layout{grid-template-columns:1fr}
+  .side-panel{position:fixed;top:0;left:0;width:min(82vw,300px);height:100vh;height:100dvh;
+    border-radius:0;transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:10px 0 30px rgba(0,0,0,.45);overflow-y:auto;z-index:80}
+  .app-shell.side-collapsed .side-panel{transform:translateX(-100%)}
+  .app-shell:not(.side-collapsed) .side-panel{transform:translateX(0)}
+  .side-backdrop{display:none;position:fixed;inset:0;background:rgba(6,12,18,.55);z-index:70}
+  .app-shell:not(.side-collapsed) .side-backdrop{display:block}
+  .game-header{padding:8px 12px}
+}
+
+/* Main area */
+.main-area{background:var(--paper);border:1px solid #e3d8bd;border-radius:12px;padding:18px 18px 20px;box-shadow:var(--shadow);min-height:520px}
+.chapter-head{margin-bottom:12px}
+.chapter-badge{display:inline-block;background:linear-gradient(#e8c07f,var(--gold-dark));color:#3a2705;border-radius:7px;
+  padding:4px 11px;font-size:12px;font-weight:950;letter-spacing:.02em;margin-right:8px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.chapter-title{display:inline;font-size:20px;font-weight:950;color:#1c2f2b}
+.chapter-sub{font-size:13px;color:var(--muted);margin-top:4px;font-weight:700}
+
+/* Dialogue */
+.dialogue-scene{display:flex;flex-direction:column;gap:8px;margin:14px 0 16px}
+.dialog-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:stretch;border:1px solid var(--line);background:var(--paper2);border-radius:10px;padding:10px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+.dialog-row.right{grid-template-columns:minmax(0,1fr) 96px}
+.dialog-row.right .dialog-character{order:2}
+.dialog-row.right .dialog-bubble{order:1}
+.dialog-character{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0}
+.dialog-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 3px 6px rgba(0,0,0,.18);flex-shrink:0}
+.dialog-avatar.coach{background:linear-gradient(#fde3d6,#f7c2a4)}
+.dialog-avatar.stu{background:linear-gradient(#dcefe9,#b9dcd0)}
+.dialog-name{padding:3px 10px;border-radius:7px;color:#fff;font-weight:900;font-size:11px;line-height:1.2;box-shadow:0 2px 0 rgba(0,0,0,.16);white-space:nowrap;text-align:center}
+.dialog-name.coach{background:linear-gradient(#f0b868,#c19a3a)}
+.dialog-name.stu{background:linear-gradient(#5cc2ab,#2f8f78)}
+.dialog-bubble{position:relative;align-self:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 14px;color:var(--ink);font-size:13.5px;line-height:1.75;font-weight:700;min-height:56px;display:flex;flex-direction:column;justify-content:center}
+.dialog-bubble::before{content:"";position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid var(--line)}
+.dialog-bubble::after{content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:9px solid var(--paper)}
+.dialog-row.right .dialog-bubble::before{left:auto;right:-10px;border-right:0;border-left:10px solid var(--line)}
+.dialog-row.right .dialog-bubble::after{left:auto;right:-8px;border-right:0;border-left:9px solid var(--paper)}
+@media (max-width:700px){
+  .dialog-row,.dialog-row.right{grid-template-columns:74px minmax(0,1fr);padding:8px;gap:8px}
+  .dialog-row.right .dialog-character{order:0}
+  .dialog-row.right .dialog-bubble{order:1}
+  .dialog-avatar{width:52px;height:52px;font-size:24px}
+  .dialog-name{font-size:9.5px;padding:3px 7px}
+  .dialog-bubble{font-size:13px;padding:9px 11px;min-height:0}
+  .dialog-row.right .dialog-bubble::before{left:-10px;right:auto;border-left:0;border-right:10px solid var(--line)}
+  .dialog-row.right .dialog-bubble::after{left:-8px;right:auto;border-left:0;border-right:9px solid var(--paper)}
+}
+
+/* Mission box */
+.mission-box{background:linear-gradient(180deg,#fff8e6,#fdefc9);border:1px solid #e3c877;border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.mission-label{font-size:11.5px;font-weight:950;color:#8a6614;margin-bottom:3px}
+.mission-text{font-size:13.5px;color:#3a2c08;font-weight:700;line-height:1.6}
+.mission-status{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:900;
+  background:#eee1bd;color:#8a6614}
+.mission-status.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-bd)}
+
+/* Stage nav / buttons */
+.stage-nav{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{border:1px solid #c9bda0;background:#fff;border-radius:8px;padding:.65rem 1.2rem;font-size:13.5px;cursor:pointer;
+  color:var(--ink);font-family:var(--f);font-weight:800;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn:hover{background:#f4efe0}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(#d9a441,#a6742a);border-color:#8f5518;color:#fff;box-shadow:0 3px 0 #6f430f}
+.btn-primary:hover{opacity:.92;background:linear-gradient(#d9a441,#a6742a)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+/* Generic choice buttons / quiz */
+.choice-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.choice-btn{border:1.5px solid #b6c9c2;background:#fff;border-radius:8px;padding:.55rem 1rem;font-size:13px;font-weight:800;
+  cursor:pointer;color:#20463d;touch-action:manipulation;text-align:left}
+.choice-btn:hover{background:#eef7f3}
+.choice-btn.choice-ok{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)}
+.choice-btn.choice-ng{background:var(--ng-bg);border-color:var(--ng-bd);color:var(--ng)}
+.quiz-q{font-size:13.5px;font-weight:850;color:#1c2f2b;margin-top:4px}
+.quiz-head{font-size:14px;font-weight:950;color:#1c2f2b;margin:18px 0 10px;padding-top:10px;border-top:1px dashed var(--line)}
+.quiz-card{background:linear-gradient(180deg,#fff,var(--paper2));border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.quiz-card .hand-row,.quiz-card .vs-row,.quiz-card .hand-block{margin-bottom:8px}
+.quiz-explain{margin-top:9px;font-size:12.5px;line-height:1.6;color:#3a2c08;background:#fff8e6;border:1px solid #e3c877;border-radius:8px;padding:8px 10px}
+
+/* Playing cards */
+.hand-row{display:flex;flex-wrap:wrap;gap:6px}
+.hand-block{margin-bottom:10px}
+.hand-label{font-size:11px;font-weight:900;color:var(--muted);margin-bottom:5px}
+.pcard{width:48px;height:66px;background:#fff;border:1px solid #cfc4a4;border-radius:7px;box-shadow:0 2px 3px rgba(0,0,0,.18);
+  display:flex;flex-direction:column;justify-content:space-between;padding:4px 5px;flex-shrink:0}
+.pcard-corner{font-size:12px;font-weight:900;line-height:1}
+.pcard-suit-big{font-size:22px;text-align:center;line-height:1}
+.pcard.red{color:var(--cred)}
+.pcard.black{color:var(--cblack)}
+
+/* Reference table (stage 1) */
+.ref-head{font-size:14px;font-weight:950;color:#1c2f2b;margin-bottom:10px}
+.ref-table{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.ref-row{display:grid;grid-template-columns:26px auto minmax(0,1fr);gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ref-rank{font-size:12px;font-weight:950;color:#fff;background:var(--gold-dark);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.ref-cards{display:flex;gap:3px}
+.ref-cards .pcard{width:34px;height:47px;padding:2px 3px}
+.ref-cards .pcard-corner{font-size:9px}
+.ref-cards .pcard-suit-big{font-size:15px}
+.ref-name{font-size:12.5px;font-weight:900;color:#1c2f2b}
+.ref-desc{font-size:11px;color:var(--muted);margin-top:1px}
+@media(max-width:560px){.ref-row{grid-template-columns:22px minmax(0,1fr);grid-template-areas:"n c" ". i"}
+  .ref-rank{grid-area:n}.ref-cards{grid-area:c}.ref-info{grid-area:i}}
+
+/* Interactive Hold'em flow diagram + stepper (stage 3: holdem rules) */
+.pcard.back{background:repeating-linear-gradient(45deg,var(--felt),var(--felt) 4px,var(--felt-dark) 4px,var(--felt-dark) 8px);border-color:rgba(255,255,255,.35)}
+.pcard.back.dim{opacity:.35}
+.holdem-diagram{padding:16px}
+.holdem-phase-tag{display:inline-block;font-size:10.5px;font-weight:950;color:#123;background:#e8c07f;border-radius:5px;padding:2px 9px;margin-bottom:8px}
+.holdem-flow-banner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;font-weight:900;color:#fff;margin-bottom:10px}
+.action-pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:950;color:#fff;flex-shrink:0}
+.action-pill.deal,.action-pill.board{background:#6b7280}
+.action-pill.sb,.action-pill.bb{background:#4d7fc9}
+.action-pill.check{background:#6b7280}
+.action-pill.bet{background:#b8791f}
+.action-pill.call{background:#2f9e5c}
+.action-pill.raise{background:#c1443a}
+.action-pill.fold{background:#7a3530}
+.action-pill.showdown{background:var(--gold-dark)}
+.holdem-pot{text-align:center;color:#f3d99a;font-weight:950;font-size:14px;margin-bottom:10px}
+.holdem-board-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.holdem-seats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.holdem-seat{display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(0,0,0,.22);border-radius:10px;padding:10px 12px;min-width:108px;transition:opacity .2s}
+.holdem-seat.you{background:rgba(217,164,65,.22);border:1px solid var(--gold)}
+.holdem-seat.winner{outline:2px solid #8ef0b0;box-shadow:0 0 0 3px rgba(142,240,176,.25)}
+.holdem-seat.folded{opacity:.45}
+.holdem-seat-name{color:#fff;font-size:11.5px;font-weight:900;white-space:nowrap}
+.holdem-seat-cards{display:flex;gap:3px}
+.holdem-seat-cards .pcard{width:34px;height:47px;padding:2px 3px}
+.holdem-seat-cards .pcard-corner{font-size:9px}
+.holdem-seat-cards .pcard-suit-big{font-size:15px}
+.holdem-seat-chip{font-size:10.5px;color:#f3d99a;font-weight:800;background:rgba(0,0,0,.3);border-radius:999px;padding:2px 10px;min-height:16px;text-align:center;white-space:nowrap}
+.holdem-seat-chip.chip-blind{background:rgba(77,127,201,.6);color:#fff}
+.holdem-seat-chip.chip-check{background:rgba(107,114,128,.55);color:#fff}
+.holdem-seat-chip.chip-bet{background:rgba(184,121,31,.65);color:#fff}
+.holdem-seat-chip.chip-call{background:rgba(47,158,92,.6);color:#fff}
+.holdem-seat-chip.chip-raise{background:rgba(193,68,58,.65);color:#fff}
+.holdem-seat-chip.chip-fold{background:rgba(122,53,48,.6);color:#fff}
+.holdem-seat-chip.chip-order{background:rgba(0,0,0,.4);color:#f3d99a;font-weight:950}
+
+/* Circular table diagram (position stage): seats placed around an oval,
+   like looking down at a real table. No fixed "you" seat (the button
+   rotates every hand), no per-seat number/action badges — captions plus
+   ring-highlight states (start/acting/resolved/blind) carry the teaching. */
+.poker-oval-wrap{position:relative;width:100%;max-width:440px;aspect-ratio:1.4;margin:4px auto 0}
+.poker-oval-felt{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 100%);box-shadow:inset 0 0 26px rgba(0,0,0,.4)}
+.poker-oval-seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center}
+.poker-oval-seat-badge{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;text-align:center;line-height:1.1;padding:2px}
+.poker-oval-seat.blind .poker-oval-seat-badge{border-color:#4d7fc9;box-shadow:0 0 0 4px rgba(77,127,201,.3)}
+.poker-oval-seat.start .poker-oval-seat-badge{border-color:#8ef0b0;box-shadow:0 0 0 4px rgba(142,240,176,.3)}
+.poker-oval-seat.acting .poker-oval-seat-badge{border-color:#f3d99a;box-shadow:0 0 0 5px rgba(243,217,154,.3)}
+.poker-oval-seat.resolved .poker-oval-seat-badge{opacity:.5}
+.poker-oval-seat.zone-early .poker-oval-seat-badge{border-color:#e2664d;box-shadow:0 0 0 4px rgba(226,102,77,.35)}
+.poker-oval-seat.zone-mid .poker-oval-seat-badge{border-color:#e0b64d;box-shadow:0 0 0 4px rgba(224,182,77,.35)}
+.poker-oval-seat.zone-late .poker-oval-seat-badge{border-color:#5ec98f;box-shadow:0 0 0 4px rgba(94,201,143,.35)}
+.poker-oval-zone-tag{text-align:center;font-size:12px;font-weight:900;margin-top:8px;padding:3px 10px;border-radius:999px;display:inline-block}
+.poker-oval-zone-wrap{text-align:center}
+.holdem-caption{color:#e5f2eb;font-size:12.5px;line-height:1.7;margin-top:14px;background:rgba(0,0,0,.2);border-radius:8px;padding:10px 12px}
+.step-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0}
+.step-progress{font-size:12px;color:var(--muted);font-weight:800;min-width:60px;text-align:center}
+
+/* Main pot / side pot mini-diagram (all-in scenario) */
+.action-pill.allin{background:#8b3fae}
+.action-pill.split{background:#8b3fae}
+.holdem-seat-chip.chip-allin{background:rgba(139,63,174,.65);color:#fff}
+.holdem-seat-stack{font-size:10px;color:#a9c7be;margin-top:-2px}
+.pot-split-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.pot-split-box{background:rgba(0,0,0,.25);border-radius:10px;padding:8px 18px;text-align:center;min-width:120px}
+.pot-split-box.side{background:rgba(139,63,174,.22)}
+.pot-split-label{font-size:10.5px;color:#cfe4de;font-weight:800}
+.pot-split-amount{font-size:17px;color:#f3d99a;font-weight:950}
+.pot-split-eligible{font-size:10px;color:#a9c7be;margin-top:2px;line-height:1.5}
+.holdem-seat-result-tag{display:inline-block;font-size:9.5px;font-weight:950;color:#123;background:#8ef0b0;border-radius:5px;padding:1px 7px;margin-top:4px}
+.holdem-seat-result-tag.side{background:#d8b6f0}
+
+.action-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+@media(min-width:520px){.action-grid{grid-template-columns:1fr 1fr}}
+.action-item{font-size:12.5px;line-height:1.6}
+.action-item b{color:#8a6614}
+
+/* Compare (stage 2) */
+.vs-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.vs-divider{font-size:13px;font-weight:950;color:var(--gold-dark);flex-shrink:0}
+
+/* Chen formula box (stage 4) */
+.chen-box{background:linear-gradient(180deg,#fff8e6,#fdefc9);border:1px solid #e3c877;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;line-height:1.9;color:#3a2c08}
+.chen-box b{color:#8a6614}
+
+/* Bet sizing stage: concrete 3-trial worked example */
+.bluff-trials{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.bluff-trial{display:grid;grid-template-columns:1fr 70px;grid-template-areas:"label result" "desc desc";gap:2px 12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.bluff-trial-label{grid-area:label;font-size:12.5px;font-weight:900;color:#1c2f2b}
+.bluff-trial-result{grid-area:result;font-size:20px;font-weight:950;text-align:right}
+.bluff-trial-result.plus{color:var(--ok)}
+.bluff-trial-result.minus{color:var(--ng)}
+.bluff-trial-desc{grid-area:desc;font-size:11.5px;color:var(--muted);line-height:1.5}
+
+/* Position stage: reference table + "who is acting" highlight */
+.pos-table{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.pos-row{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr) 90px;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.pos-row.head{background:transparent;border:none;padding:0 12px;font-size:10.5px;font-weight:900;color:var(--muted)}
+.pos-name{font-size:13px;font-weight:950;color:#1c2f2b}
+.pos-cell{font-size:11.5px;color:var(--muted);line-height:1.5}
+.pos-cat{font-size:11px;font-weight:900;text-align:center;border-radius:999px;padding:3px 8px}
+.pos-cat.early{background:var(--ng-bg);color:var(--ng)}
+.pos-cat.mid{background:#fff3d6;color:#8a6614}
+.pos-cat.late{background:var(--ok-bg);color:var(--ok)}
+.pos-cat.blind{background:#e2ecfb;color:#3a5f9c}
+@media(max-width:560px){.pos-row{grid-template-columns:1fr 1fr;grid-template-areas:"n n" "a b" "c c"}.pos-row.head{display:none}
+  .pos-name{grid-area:n}.pos-cell:nth-of-type(1){grid-area:a}.pos-cell:nth-of-type(2){grid-area:b}.pos-cat{grid-area:c;justify-self:start}}
+.holdem-seat.acting{outline:2px dashed #f3d99a;box-shadow:0 0 0 4px rgba(243,217,154,.18)}
+
+/* Range grid (13x13 starting-hand chart) */
+.range-grid-wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.range-grid-block{flex:1;min-width:250px;max-width:360px}
+.range-grid-title{font-size:11.5px;font-weight:900;color:#1c2f2b;margin-bottom:6px;text-align:center}
+.range-grid{display:grid;grid-template-columns:repeat(13,1fr);gap:2px}
+.range-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;border-radius:2px;color:#1c2f2b}
+.range-cell.bucket-premium{background:#2f9e5c;color:#fff}
+.range-cell.bucket-strong{background:#8fd1ab}
+.range-cell.bucket-playable{background:#f3e08a}
+.range-cell.bucket-out{background:#eee6d3;color:#b8ab8c}
+.range-legend{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:10.5px;margin-bottom:16px;color:var(--muted)}
+.range-legend-item{display:flex;align-items:center;gap:4px}
+.range-legend-swatch{width:12px;height:12px;border-radius:2px;display:inline-block}
+
+/* Blocker combo grid */
+.blocker-combo-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px}
+.blocker-combo{width:96px;padding:8px;text-align:center;border-radius:8px;border:1.5px solid var(--line);background:#fff}
+.blocker-combo .hand-row{justify-content:center;margin-bottom:6px}
+.blocker-combo .pcard{width:30px;height:42px;padding:2px 3px}
+.blocker-combo .pcard-corner{font-size:8px}
+.blocker-combo .pcard-suit-big{font-size:13px}
+.blocker-combo-label{font-size:10.5px;font-weight:900}
+.blocker-combo.blocked{background:#eee6d3;border-color:#ddd0ad}
+.blocker-combo.blocked .pcard{opacity:.4}
+.blocker-combo.blocked .blocker-combo-label{color:#b8ab8c}
+.blocker-combo.possible{background:var(--ok-bg);border-color:var(--ok-bd)}
+.blocker-combo.possible .blocker-combo-label{color:var(--ok)}
+
+/* Scenario info card (outs / pot odds) */
+.scenario-info{display:flex;flex-wrap:wrap;gap:6px 16px;background:#fbf7ea;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:800;color:#3a2c08}
+.scenario-info span b{color:var(--gold-dark)}
+
+/* Shared table felt background (used by the position-stage oval table) */
+.table-felt{background:radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 100%);border-radius:14px;padding:16px;box-shadow:inset 0 0 24px rgba(0,0,0,.4)}
+
+/* Ending */
+.ending{text-align:center;padding:20px 10px}
+.ending h2{font-size:22px;margin-bottom:14px;color:#1c2f2b}
+.ending p{font-size:13.5px;line-height:1.8;color:#3a2c08;margin-bottom:16px}
+.ending-list{text-align:left;display:inline-block;background:#fff8e6;border:1px solid #e3c877;border-radius:10px;padding:14px 18px;font-size:12.5px;line-height:2;color:#3a2c08;margin-bottom:18px}
+
+/* Book recommendation */
+#book-recommend{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.14));border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 16px}
+.book-recommend-label{display:inline-block;font-size:10px;font-weight:900;color:#cfe4de;border:1px solid #cfe4de;border-radius:4px;padding:0 5px;margin:0 0 6px}
+.book-recommend-lead{font-size:12px;color:#cfe4de;margin:0 0 4px;font-weight:700}
+#book-recommend a{font-size:13px;color:#f3c47a;font-weight:900;text-decoration:underline}
+
+/* Glossary: clickable jargon terms + popover definition */
+.glossary-term{border-bottom:1.5px dashed currentColor;opacity:.92;cursor:help;touch-action:manipulation}
+.glossary-term:hover,.glossary-term:active{background:rgba(217,164,65,.22);border-radius:2px}
+#glossary-tooltip{position:fixed;z-index:300;max-width:280px;background:#1c2f2b;color:#fff;border:1px solid var(--gold);
+  border-radius:8px;padding:10px 30px 10px 12px;font-size:12.5px;line-height:1.6;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  display:none}
+#glossary-tooltip.show{display:block}
+#glossary-tooltip .gt-term{font-weight:950;color:var(--gold);margin-bottom:4px;font-size:12.5px}
+#glossary-tooltip .gt-def{color:#eaf6f2}
+#glossary-tooltip .gt-close{position:absolute;top:4px;right:6px;width:22px;height:22px;cursor:pointer;color:#cfe4de;
+  font-size:14px;background:none;border:none;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title">🃏 POKER QUEST 戦略編</div>
+      <div class="brand-sub">― 役とオッズを学ぶ道場 ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 10</div>
+      <div class="head-progress"><div class="head-progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="header-actions">
+      <a class="head-reset home-badge" href="https://ruglerugle.github.io/" title="クエスト集トップへ" aria-label="クエスト集トップへ">🧭</a>
+      <a class="head-reset" href="index.html">🗺️ 目次へ</a>
+      <a class="head-reset" href="rules.html">📖 ルール編へ</a>
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area" id="main-area"></main>
+  </div>
+
+  <div id="book-recommend"></div>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   utilities
+   ===================================================================== */
+function qs(sel, root){ return (root||document).querySelector(sel); }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function randInt(min,max){ return min + Math.floor(Math.random()*(max-min+1)); }
+function pick(arr){ return arr[randInt(0,arr.length-1)]; }
+function shuffleArr(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=randInt(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function sampleN(arr,n){ return shuffleArr(arr).slice(0,n); }
+
+/* =====================================================================
+   glossary: tap a jargon term anywhere in the page to see its definition.
+   linkGlossaryIn() walks the rendered text of a container and wraps any
+   matching term in a clickable span; a single delegated click listener
+   (set up once at boot) shows a positioned tooltip. Re-running
+   linkGlossaryIn on already-linked content is a no-op (it skips text
+   nodes whose ancestor is already a .glossary-term), so callers can
+   call it freely after every re-render without worrying about double-wrapping.
+   ===================================================================== */
+const GLOSSARY = {
+  'ホールカード': '自分だけに配られる、他のプレイヤーには見せない2枚の手札。',
+  'コミュニティカード': 'テーブル中央に公開される、全員で共有するカード(フロップ3枚+ターン1枚+リバー1枚の計5枚)。',
+  'プリフロップ': 'ホールカードが配られた直後、コミュニティカードがまだ1枚も公開されていない最初のベッティングラウンド。手札2枚だけを頼りに判断する。',
+  'ポストフロップ': 'フロップが公開されて以降の総称。フロップ・ターン・リバーの3つのベッティングラウンドをまとめてこう呼ぶ。手札に加えて公開されたコミュニティカードの情報も使って判断できる。',
+  'フロップ': '最初に公開される3枚のコミュニティカード。ここから2回目のベッティングラウンドが始まる。',
+  'ターン': 'フロップの次に公開される4枚目のコミュニティカード。',
+  'リバー': '最後に公開される5枚目のコミュニティカード。',
+  'ショーダウン': '最後まで残ったプレイヤー同士でカードを見せ合い、役の強さを比べること。',
+  'キッカー': '役の直接の構成には使わない、残りのカード。同じ役同士の勝敗を決める材料になる。',
+  'スーテッド': '2枚の手札が同じスート(マーク)であること。役や強さの計算にプラスに働く。',
+  'コネクター': '2枚の手札の数字が連続していること(例：9と8)。ストレートを狙いやすい。',
+  'ブラインド': 'プリフロップで強制的に賭けさせられる少額のベット。',
+  'スモールブラインド': 'ブラインドのうち少ない方の額。ボタンの次に座る人が払う。',
+  'ビッグブラインド': 'ブラインドのうち多い方の額。スモールブラインドの次に座る人が払う。',
+  'オールイン': '残っているチップをすべて賭けること。それ以上は賭けようがない。',
+  'メインポット': 'オールインが起きたとき、参加者全員が獲得資格を持つポットの部分。',
+  'サイドポット': 'オールインした人より多く賭けた人たちだけが獲得資格を持つ、追加のポット。',
+  'ポジション': 'テーブル上の座席の位置。行動する順番と、得られる情報量を左右する。',
+  'ボタン': 'ディーラー役を示す印。この位置にいる人は、フロップ以降は常に最後に行動できる。',
+  'アウツ': '今の手札を、より強い役に完成させてくれる残りのカードの枚数。',
+  'ドロー': '役があと少しで完成しそうな、未完成の状態。',
+  'ポットオッズ': 'コールに必要な金額と、獲得できるポットの大きさの比率から計算する「必要勝率」。',
+  'エクイティ': '今の時点での、自分が最終的に勝てる見込みの確率。',
+  '期待値': '長期的に見たときの、平均的な損得の見込み。プラスなら得(+EV)、マイナスなら損(-EV)。',
+  'レンジ': '相手が持っている可能性のある手札の範囲(分布)。1つの手に決め打ちしない考え方。',
+  'ハンドリーディング': '相手の行動から、持っている手札のレンジを読み取る技術。',
+  'ブラフ': '弱い手なのに強い手のふりをして、相手を降ろさせるための賭け方。',
+};
+const GLOSSARY_REGEX = new RegExp('(' + Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length).map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|') + ')');
+function linkGlossaryIn(root){
+  if(!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const targets = [];
+  let node;
+  while((node = walker.nextNode())){
+    if(!node.nodeValue || !GLOSSARY_REGEX.test(node.nodeValue)) continue;
+    let el = node.parentElement, skip = false;
+    while(el && el!==root){
+      if(el.tagName==='BUTTON' || el.tagName==='H2' || el.classList.contains('glossary-term') || el.classList.contains('choice-btn') || el.classList.contains('chapter-title')){ skip = true; break; }
+      el = el.parentElement;
+    }
+    if(!skip) targets.push(node);
+  }
+  targets.forEach(textNode=>{
+    const parts = textNode.nodeValue.split(GLOSSARY_REGEX);
+    if(parts.length<=1) return;
+    // Wrap everything in a single inline <span> (not a bare DocumentFragment) so
+    // that replacing the one original text node still leaves exactly one child
+    // in the parent — this matters because several containers in this app use
+    // display:flex (e.g. .dialog-bubble), where multiple top-level sibling
+    // nodes would each become their own flex item and stack on separate lines.
+    const wrap = document.createElement('span');
+    parts.forEach((part,i)=>{
+      if(!part) return;
+      if(i%2===1){
+        const span = document.createElement('span');
+        span.className = 'glossary-term';
+        span.textContent = part;
+        span.dataset.term = part;
+        wrap.appendChild(span);
+      } else {
+        wrap.appendChild(document.createTextNode(part));
+      }
+    });
+    textNode.parentNode.replaceChild(wrap, textNode);
+  });
+}
+function showGlossaryTooltip(span){
+  const def = GLOSSARY[span.dataset.term];
+  if(!def) return;
+  let tip = document.getElementById('glossary-tooltip');
+  if(!tip){
+    tip = document.createElement('div');
+    tip.id = 'glossary-tooltip';
+    tip.innerHTML = '<button class="gt-close" aria-label="閉じる">✕</button><div class="gt-term"></div><div class="gt-def"></div>';
+    document.body.appendChild(tip);
+    tip.querySelector('.gt-close').addEventListener('click', (e)=>{ e.stopPropagation(); hideGlossaryTooltip(); });
+  }
+  tip.querySelector('.gt-term').textContent = span.dataset.term;
+  tip.querySelector('.gt-def').textContent = def;
+  tip.classList.remove('show'); tip.style.visibility = 'hidden'; tip.classList.add('show');
+  const rect = span.getBoundingClientRect();
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = rect.left, top = rect.bottom + 6;
+  if(left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+  if(left < 8) left = 8;
+  if(top + th > window.innerHeight - 8) top = rect.top - th - 6;
+  if(top < 8) top = 8;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+  tip.style.visibility = '';
+}
+function hideGlossaryTooltip(){
+  const tip = document.getElementById('glossary-tooltip');
+  if(tip) tip.classList.remove('show');
+}
+document.addEventListener('click', (e)=>{
+  const term = e.target.closest('.glossary-term');
+  if(term){ e.stopPropagation(); showGlossaryTooltip(term); return; }
+  if(!e.target.closest('#glossary-tooltip')) hideGlossaryTooltip();
+});
+
+/* =====================================================================
+   card model
+   ===================================================================== */
+const SUITS = ['s','h','d','c'];
+const SUIT_SYMBOL = {s:'♠',h:'♥',d:'♦',c:'♣'};
+function mkCard(rank,suit){ return {rank,suit}; }
+function rankLabel(r){ return r===14?'A': r===13?'K': r===12?'Q': r===11?'J': String(r); }
+function cardHtml(card){
+  const red = card.suit==='h'||card.suit==='d';
+  return `<div class="pcard ${red?'red':'black'}"><div class="pcard-corner">${rankLabel(card.rank)}${SUIT_SYMBOL[card.suit]}</div><div class="pcard-suit-big">${SUIT_SYMBOL[card.suit]}</div></div>`;
+}
+function freshDeck(){ const d=[]; SUITS.forEach(s=>{ for(let r=2;r<=14;r++) d.push(mkCard(r,s)); }); return d; }
+function randDistinctRanks(n){
+  const pool=[]; for(let r=2;r<=14;r++) pool.push(r);
+  return sampleN(pool,n);
+}
+
+/* =====================================================================
+   hand evaluator (verified against brute-force outs counting & many
+   randomized category checks before shipping)
+   ===================================================================== */
+function evaluate5(cards){
+  const ranksSorted = cards.map(c=>c.rank).sort((a,b)=>b-a);
+  const suits = cards.map(c=>c.suit);
+  const isFlush = suits.every(s=>s===suits[0]);
+  const uniqueRanks = [...new Set(ranksSorted)];
+  let isStraight=false, straightHigh=0;
+  if(uniqueRanks.length===5){
+    if(uniqueRanks[0]-uniqueRanks[4]===4){ isStraight=true; straightHigh=uniqueRanks[0]; }
+    else if(JSON.stringify(uniqueRanks)===JSON.stringify([14,5,4,3,2])){ isStraight=true; straightHigh=5; }
+  }
+  const counts = {};
+  ranksSorted.forEach(r=>counts[r]=(counts[r]||0)+1);
+  const groups = Object.entries(counts).map(([r,c])=>({rank:Number(r),count:c}))
+     .sort((a,b)=> b.count-a.count || b.rank-a.rank);
+
+  if(isStraight && isFlush) return {cat:8, tie:[straightHigh]};
+  if(groups[0].count===4) return {cat:7, tie:[groups[0].rank, groups[1].rank]};
+  if(groups[0].count===3 && groups[1] && groups[1].count>=2) return {cat:6, tie:[groups[0].rank, groups[1].rank]};
+  if(isFlush) return {cat:5, tie:ranksSorted};
+  if(isStraight) return {cat:4, tie:[straightHigh]};
+  if(groups[0].count===3) return {cat:3, tie:[groups[0].rank, ...groups.slice(1).map(g=>g.rank)]};
+  if(groups[0].count===2 && groups[1] && groups[1].count===2){
+    const kicker = groups[2].rank;
+    return {cat:2, tie:[groups[0].rank, groups[1].rank, kicker]};
+  }
+  if(groups[0].count===2) return {cat:1, tie:[groups[0].rank, ...groups.slice(1).map(g=>g.rank)]};
+  return {cat:0, tie:ranksSorted};
+}
+function compareEval(a,b){
+  if(a.cat!==b.cat) return a.cat-b.cat;
+  for(let i=0;i<Math.max(a.tie.length,b.tie.length);i++){
+    const av=a.tie[i]||0, bv=b.tie[i]||0;
+    if(av!==bv) return av-bv;
+  }
+  return 0;
+}
+function kCombinations(arr, k){
+  const results=[];
+  function helper(start, combo){
+    if(combo.length===k){ results.push([...combo]); return; }
+    for(let i=start;i<arr.length;i++){ combo.push(arr[i]); helper(i+1,combo); combo.pop(); }
+  }
+  helper(0,[]);
+  return results;
+}
+function bestOf(cards){
+  const combos = cards.length===5 ? [cards] : kCombinations(cards,5);
+  let best=null, bestCombo=null;
+  combos.forEach(c=>{ const e=evaluate5(c); if(!best || compareEval(e,best)>0){ best=e; bestCombo=c; } });
+  return {eval:best, cards:bestCombo};
+}
+const CAT_NAMES = ['ハイカード','ワンペア','ツーペア','スリーカード','ストレート','フラッシュ','フルハウス','フォーカード','ストレートフラッシュ'];
+function catDisplayName(ev){ return (ev.cat===8 && ev.tie[0]===14) ? 'ロイヤルフラッシュ' : CAT_NAMES[ev.cat]; }
+
+/* =====================================================================
+   simplified Chen-formula starting hand score
+   ===================================================================== */
+function cardVal(r){ if(r===14) return 10; if(r===13) return 8; if(r===12) return 7; if(r===11) return 6; return r/2; }
+function chenScore(r1,r2,suited){
+  const hi=Math.max(r1,r2), lo=Math.min(r1,r2);
+  let score = cardVal(hi);
+  if(r1===r2){ return Math.max(score*2, 5); }
+  if(suited) score += 2;
+  const gap = hi-lo-1;
+  if(gap===1) score-=1; else if(gap===2) score-=2; else if(gap===3) score-=4; else if(gap>=4) score-=5;
+  if(gap<=1 && hi<=12) score+=1;
+  return Math.max(score,0);
+}
+function classifyBucket(score){ if(score>=10) return 'premium'; if(score>=7) return 'strong'; if(score>=5) return 'playable'; return 'weak'; }
+
+/* =====================================================================
+   dialogue renderer
+   ===================================================================== */
+function renderDialogue(lines){
+  return lines.map(l=>{
+    const isStu = l.who === 'stu';
+    const icon = l.who==='coach' ? '🎩' : '🔰';
+    const name = l.who==='coach' ? 'コーチ' : 'ミカ（見習い）';
+    return `<div class="dialog-row${isStu?' right':''}">
+      <div class="dialog-character"><div class="dialog-avatar ${l.who}">${icon}</div><div class="dialog-name ${l.who}">${name}</div></div>
+      <div class="dialog-bubble">${l.text}</div>
+    </div>`;
+  }).join('');
+}
+
+/* =====================================================================
+   generic MCQ quiz block — every card must be answered correctly on
+   the first click for the stage's onDone callback to fire; a wrong
+   click locks that card until the whole stage is retried.
+   ===================================================================== */
+function renderQuizArea(container, quizzes, onDone){
+  container.innerHTML = quizzes.map((q,qi)=>`
+    <div class="quiz-card" data-qi="${qi}">
+      ${q.visual || ''}
+      <div class="quiz-q">Q${qi+1}. ${q.q}</div>
+      <div class="choice-list">${q.choices.map((c,ci)=>`<button class="choice-btn" data-qi="${qi}" data-ci="${ci}">${escapeHtml(c)}</button>`).join('')}</div>
+      <div class="quiz-explain" style="display:none"></div>
+    </div>`).join('');
+  linkGlossaryIn(container);
+  const solved = new Set();
+  container.querySelectorAll('.choice-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qi = Number(btn.dataset.qi), ci = Number(btn.dataset.ci);
+      const card = container.querySelector(`.quiz-card[data-qi="${qi}"]`);
+      if(card.classList.contains('answered')) return;
+      const q = quizzes[qi];
+      const isOk = ci === q.correct;
+      card.querySelectorAll('.choice-btn').forEach((b,i)=>{
+        if(i===q.correct) b.classList.add('choice-ok');
+        else if(i===ci && !isOk) b.classList.add('choice-ng');
+      });
+      card.classList.add('answered');
+      const ex = card.querySelector('.quiz-explain');
+      ex.style.display = 'block';
+      ex.innerHTML = (isOk ? '✅ 正解。 ' : '❌ 不正解。 ') + q.explain;
+      linkGlossaryIn(ex);
+      if(isOk){ solved.add(qi); if(solved.size === quizzes.length) onDone(); }
+    });
+  });
+}
+
+/* =====================================================================
+   Stage 3: スターティングハンド評価
+   ===================================================================== */
+function buildStarting(root, ctx){
+  const BUCKET_LABELS = {premium:'プレミアム(積極的に勝負)', strong:'強い(基本参加)', playable:'普通(状況次第)', weak:'弱い(基本は降りる)'};
+  const order = ['premium','strong','playable','weak'];
+  const targets = ['premium','strong','playable','weak','strong','weak'];
+  const quizzes = targets.map(target=>{
+    let r1,r2,suited,score,bucket, tries=0;
+    do{
+      const ranks = randDistinctRanks(2);
+      if(Math.random()<0.15){ r1=ranks[0]; r2=ranks[0]; suited=false; }
+      else { r1=ranks[0]; r2=ranks[1]; suited = Math.random()<0.4; }
+      score = chenScore(r1,r2,suited);
+      bucket = classifyBucket(score);
+      tries++;
+    } while(bucket!==target && tries<800);
+    const cardObjs = (r1===r2) ? [mkCard(r1,'s'),mkCard(r2,'h')]
+      : suited ? [mkCard(r1,'s'),mkCard(r2,'s')] : [mkCard(r1,'s'),mkCard(r2,'h')];
+    const choices = shuffleArr(order.map(o=>BUCKET_LABELS[o]));
+    const correctLabel = BUCKET_LABELS[bucket];
+    return {
+      visual: `<div class="hand-row">${cardObjs.map(cardHtml).join('')}</div>`,
+      q: 'このハンド、強さのランクは？',
+      choices,
+      correct: choices.indexOf(correctLabel),
+      explain: `簡易スコア ${score.toFixed(1)}点 → 「${correctLabel}」に分類されます。`,
+    };
+  });
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>簡易チェン・フォーミュラ</b>の考え方(プロが使う点数化を簡略化したもの)<br>
+      ① 高い方のカードの点数：A=10 / K=8 / Q=7 / J=6 / 10以下=数字÷2<br>
+      ② ペアなら①の点数を2倍(最低5点)<br>
+      ③ スーテッド(同じスート)なら+2点<br>
+      ④ 2枚の数字差(ギャップ)で減点：連続(コネクター)は減点なし／1つ飛びは-1点／2つ飛びは-2点／3つ飛びは-4点／4つ以上飛ぶと-5点<br>
+      ⑤ ギャップ1以下(連続または1つ飛び)かつ高い方がQ以下ならストレートが狙いやすいので+1点<br>
+      → <b>10点以上=プレミアム／7点以上=強い／5点以上=普通／それ未満=弱い</b>
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：ハンドの強さを判定しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: ポジションの概念
+   ===================================================================== */
+const POSITION_ZONE_LABEL = {early:'アーリーポジション', mid:'ミドルポジション', late:'レイトポジション', blind:'ブラインド'};
+const POSITION_TABLE = [
+  {name:'UTG', pre:'プリフロップ：1番目(最初)', post:'フロップ以降：3番目', cat:'early'},
+  {name:'UTG+1', pre:'プリフロップ：2番目', post:'フロップ以降：4番目', cat:'early'},
+  {name:'MP', pre:'プリフロップ：3番目', post:'フロップ以降：5番目', cat:'mid'},
+  {name:'LJ(ロージャック)', pre:'プリフロップ：4番目', post:'フロップ以降：6番目', cat:'mid'},
+  {name:'HJ(ハイジャック)', pre:'プリフロップ：5番目', post:'フロップ以降：7番目', cat:'mid'},
+  {name:'CO(カットオフ)', pre:'プリフロップ：6番目', post:'フロップ以降：8番目', cat:'late'},
+  {name:'BTN(ボタン)', pre:'プリフロップ：7番目', post:'フロップ以降：9番目(最後・最強)', cat:'late'},
+  {name:'SB(スモールブラインド)', pre:'プリフロップ：8番目', post:'フロップ以降：1番目(最初)', cat:'blind'},
+  {name:'BB(ビッグブラインド)', pre:'プリフロップ：9番目(最後)', post:'フロップ以降：2番目', cat:'blind'},
+];
+/* デモは下の一覧表とまったく同じ9つの座席を使い、フルテーブルで一貫させて誤解を避ける。
+   「アーリー/ミドル/レイト」はどれも1つの席の呼び名ではなく、近い性質の複数席を
+   まとめた"大まかな範囲"の呼び方——という点をズーム演出(zoneHighlight)で見せる。 */
+/* Seats listed in real clockwise physical order around the table (fixed
+   geometry — only the "current street" changes who acts first, not where
+   anyone is sitting). No seat is pinned to "you": the button rotates every
+   hand, so labeling one seat "あなた" would be misleading. */
+const POSITION_DEMO_SEATS = [
+  {key:'utg', name:'UTG', zone:'early'},
+  {key:'utg1', name:'UTG+1', zone:'early'},
+  {key:'mp', name:'MP', zone:'mid'},
+  {key:'lj', name:'LJ', zone:'mid'},
+  {key:'hj', name:'HJ', zone:'mid'},
+  {key:'co', name:'CO', zone:'late'},
+  {key:'btn', name:'BTN', zone:'late'},
+  {key:'sb', name:'SB', zone:'blind'},
+  {key:'bb', name:'BB', zone:'blind'},
+];
+const POSITION_SEAT_ANGLES = POSITION_DEMO_SEATS.map((_,i)=>-90 + i*40); // degrees, clockwise from top
+function ovalSeatStyle(i){
+  const rad = POSITION_SEAT_ANGLES[i] * Math.PI/180;
+  const x = 50 + 45*Math.cos(rad);
+  const y = 50 + 42*Math.sin(rad);
+  return `left:${x}%;top:${y}%`;
+}
+const POSITION_DEMO_EVENTS = [
+  {banner:'9人テーブルで見てみよう',
+    caption:'UTG・UTG+1・MP・LJ・HJ・CO・BTN・SB・BBの9つの座席。SB・BBは「ブラインドを払う」独立した席で、他の7つとは別物であることに注意しよう。'},
+  {zoneHighlight:'early', banner:'UTG・UTG+1の2席が「アーリーポジション」',
+    caption:'どちらも一番早く判断しなければならない、情報が少なく不利な席のグループ。「アーリー」は1つの席の名前ではなく、こうした複数の席をまとめた呼び方。'},
+  {zoneHighlight:'mid', banner:'MP・LJ・HJの3席が「ミドルポジション」',
+    caption:'MP・LJ(ロージャック)・HJ(ハイジャック)の3席をまとめてこう呼ぶ。アーリーほど不利ではないが、レイトほど有利でもない中間のグループ。'},
+  {zoneHighlight:'late', banner:'CO・BTNの2席が「レイトポジション」',
+    caption:'CO(カットオフ)とBTN(ボタン)をまとめてこう呼ぶ。後で行動できる＝もっとも有利なグループで、参加するハンドを広げやすい。'},
+  {zoneHighlight:'blind', banner:'SB・BBは「ブラインド」という別枠',
+    caption:'SB・BBはプリフロップこそ最後の2人だが、フロップ以降は逆に最初の2人になる特殊な立場。アーリー/ミドル/レイトのどれにも含めず、別枠で扱う。'},
+  {blindKeys:['sb','bb'], banner:'プリフロップ開始：まずブラインドが強制的に賭けられる',
+    caption:'ブラインドとは、プリフロップで強制的に賭けさせられる少額のベット。BTNのすぐ左隣のSBが5、その隣のBBが10を払う。他の7人はブラインドを払わない。'},
+  {start:'utg', banner:'プリフロップの行動順：UTGから時計回りにBBまで',
+    caption:'プリフロップはUTGが最初。UTG→UTG+1→MP→LJ→HJ→CO→BTN→SB→BBの順に時計回りで進み、ブラインドを払ったSB・BBが逆に最後の2人になる(BBは「オプション」を持つため一番最後)。'},
+  {start:'sb', banner:'フロップ以降は順番が変わる：SBから時計回りにBTNまで',
+    caption:'フロップ以降は一転、SBが最初。SB→BB→UTG→UTG+1→MP→LJ→HJ→CO→BTNの順に進み、BTNが常に最後——これがレイトポジションが最強と言われる理由。'},
+  {acting:'sb', banner:'SBの番：誰の反応も見られないまま判断',
+    caption:'SBは、自分の手札とボードの情報だけで判断しなければならない。フロップ以降、最初に行動する立場。'},
+  {acting:'bb', resolvedKeys:['sb'], banner:'BBの番：SBの行動だけは見てから判断できる',
+    caption:'BBは、SBがチェックしたという情報を1つ得たうえで判断できる。'},
+  {resolvedKeys:['sb','bb','utg','utg1','mp','lj','hj'], banner:'アーリー・ミドルの面々も、順番に前の人の反応を見ながら判断していく',
+    caption:'自分より前に行動した人数が多いほど、判断材料は増えていく。COはこの時点でもう7人分の情報を得られる。'},
+  {acting:'co', resolvedKeys:['sb','bb','utg','utg1','mp','lj','hj'], banner:'COの番：レイトポジションの入り口',
+    caption:'CO(カットオフ)は、BTNの1つ前。レイトポジションの中では2番目に行動するが、それでも他の7人の情報を得たうえで判断できる。'},
+  {acting:'btn', resolvedKeys:['sb','bb','utg','utg1','mp','lj','hj','co'], banner:'BTNの番：他の8人全員の行動を見てから判断できる',
+    caption:'一番遅く行動するBTNが、もっとも多くの情報を得られる＝もっとも有利なポジション。テーブルの人数が増えるほど、この情報差はさらに大きくなる。'},
+];
+function renderPositionDemo(container, idx){
+  const ev = POSITION_DEMO_EVENTS[idx];
+  const seatsHtml = POSITION_DEMO_SEATS.map((s,i)=>{
+    const classes = ['poker-oval-seat'];
+    if(ev.blindKeys && ev.blindKeys.includes(s.key)) classes.push('blind');
+    if(ev.start===s.key) classes.push('start');
+    if(ev.acting===s.key) classes.push('acting');
+    if(ev.resolvedKeys && ev.resolvedKeys.includes(s.key)) classes.push('resolved');
+    if(ev.zoneHighlight){
+      if(s.zone===ev.zoneHighlight) classes.push('zone-'+s.zone);
+      else classes.push('resolved');
+    }
+    const label = ev.start===s.key ? `▶ ${s.name}` : s.name;
+    return `<div class="${classes.join(' ')}" style="${ovalSeatStyle(i)}">
+      <div class="poker-oval-seat-badge">${label}</div>
+    </div>`;
+  }).join('');
+  const zoneTag = ev.zoneHighlight ? `<div class="poker-oval-zone-wrap"><span class="poker-oval-zone-tag pos-cat ${ev.zoneHighlight}">${POSITION_ZONE_LABEL[ev.zoneHighlight]}</span></div>` : '';
+  container.innerHTML = `
+    <div class="table-felt holdem-diagram">
+      <div class="holdem-flow-banner">${ev.banner}</div>
+      <div class="poker-oval-wrap"><div class="poker-oval-felt"></div>${seatsHtml}</div>
+      ${zoneTag}
+      <div class="holdem-caption">${ev.caption}</div>
+    </div>`;
+}
+function mountPositionDemo(root){
+  let stepIdx = 0;
+  function render(){
+    renderPositionDemo(qs('#position-demo-diagram', root), stepIdx);
+    linkGlossaryIn(qs('#position-demo-diagram', root));
+    qs('#position-demo-progress', root).textContent = `${stepIdx+1} / ${POSITION_DEMO_EVENTS.length}`;
+    qs('#position-demo-prev', root).disabled = stepIdx===0;
+  }
+  qs('#position-demo-prev', root).addEventListener('click', ()=>{ if(stepIdx>0){ stepIdx--; render(); } });
+  qs('#position-demo-next', root).addEventListener('click', ()=>{
+    stepIdx = (stepIdx < POSITION_DEMO_EVENTS.length-1) ? stepIdx+1 : 0;
+    render();
+  });
+  render();
+}
+function buildPosition(root, ctx){
+  const posTableHtml = POSITION_TABLE.map(p=>`
+    <div class="pos-row">
+      <div class="pos-name">${p.name}</div>
+      <div class="pos-cell">${p.pre}</div>
+      <div class="pos-cell">${p.post}</div>
+      <div class="pos-cat ${p.cat}">${POSITION_ZONE_LABEL[p.cat].replace('ポジション','')}</div>
+    </div>`).join('');
+
+  const quizzes = [
+    {q:'BTN(ボタン)は、フロップ以降は何番目に行動する？', choices:['真ん中あたり','最後(全員の後)','最初'], correct:1,
+      explain:'ポストフロップでは常にボタンが最後に行動する。もっとも情報が多く得られる、最強のポジション。'},
+    {q:'UTGは、プリフロップで何番目に行動する？', choices:['中盤','最後','最初(ブラインドのすぐ次)'], correct:2,
+      explain:'UTGは"Under The Gun"の略で、ブラインドの次、つまり一番最初に判断しなければならない。'},
+    {q:'「アーリーポジション」とは、どういう意味？', choices:['UTGだけを指す、たった1つの席の名前','UTG・UTG+1など、近い性質の複数の席をまとめた大まかな範囲の呼び方','SB・BBの別の呼び方'], correct:1,
+      explain:'「アーリー」「ミドル」「レイト」はどれも1つの席ではなく、UTG・UTG+1(アーリー)やMP・LJ・HJ(ミドル)のように、近い性質の複数席をまとめた大まかな範囲の呼び方。'},
+    {q:'SB(スモールブラインド)は、フロップ以降は何番目に行動する？', choices:['最初','2番目','最後'], correct:0,
+      explain:'プリフロップでは遅い方(ボタンの次)のSBだが、フロップ以降は全員の中で最初に行動しなければならない。「プリフロップは遅い＝フロップ以降も遅い」とは限らない典型例。'},
+    {q:'「後で行動できるほど有利」なのはなぜ？', choices:['持ち時間が長くもらえるから','相手の行動を見てから自分の判断を決められるから','ポットに多く賭けられるから'], correct:1,
+      explain:'相手がチェックしたかベットしたかという情報を先に得られるので、より正確な判断ができる。'},
+    {q:'ポジションが良い(遅い)とき、参加するハンドの範囲はどうするのが基本？', choices:['変える必要はない','狭めるべき','広げてもよい'], correct:2,
+      explain:'情報優位があるぶん、多少弱いハンドでも参加しやすい。次のステージで学ぶ「レンジ」の考え方にもつながる。'},
+    {q:'ポジションが悪い(早い)とき、参加するハンドの範囲はどうするのが基本？', choices:['強いハンドに絞るべき','広げてもよい','関係ない'], correct:0,
+      explain:'情報が少ないぶん、不利を負けにくくするために、強いハンドに絞って参加するのが基本。'},
+  ];
+
+  root.innerHTML = `
+    <div class="ref-head">📖 ポジションで情報量が変わる</div>
+    <div id="position-demo-diagram"></div>
+    <div class="step-controls">
+      <button class="btn" id="position-demo-prev">◀ 前へ</button>
+      <span class="step-progress" id="position-demo-progress"></span>
+      <button class="btn btn-primary" id="position-demo-next">次へ ▶</button>
+    </div>
+    <div class="ref-head">📋 ポジションの一覧(9人テーブルの例)</div>
+    <div class="pos-table">
+      <div class="pos-row head"><div>ポジション</div><div>プリフロップ</div><div>フロップ以降</div><div>分類</div></div>
+      ${posTableHtml}
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：ポジションの理解を確認しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  mountPositionDemo(root);
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage 4: アウツとオッズ
+   (outs figures verified by brute-force enumeration against the deck)
+   ===================================================================== */
+const OUTS_SCENARIOS = [
+  { hole:[[14,'s'],[13,'s']], board:[[12,'s'],[7,'s'],[2,'h']], outs:9, streets:2, draw:'フラッシュドロー' },
+  { hole:[[9,'d'],[8,'c']], board:[[7,'s'],[6,'h'],[2,'d']], outs:8, streets:2, draw:'オープンエンド・ストレートドロー' },
+  { hole:[[11,'h'],[10,'s']], board:[[9,'d'],[7,'c'],[2,'s']], outs:4, streets:2, draw:'ガットショット(インサイド)ドロー' },
+  { hole:[[14,'h'],[5,'h']], board:[[13,'h'],[9,'h'],[4,'c'],[2,'d']], outs:9, streets:1, draw:'フラッシュドロー(ターン)' },
+  { hole:[[11,'s'],[10,'s']], board:[[9,'s'],[8,'h'],[2,'s']], outs:15, streets:2, draw:'コンボドロー(フラッシュ+ストレート)' },
+];
+function numericChoices(correct, spread, unit){
+  const set = new Set([correct]);
+  let guard=0;
+  while(set.size<4 && guard<200){ guard++; const d = correct + randInt(-spread,spread); if(d>0 && d!==correct) set.add(d); }
+  return shuffleArr([...set]).map(n=>n+unit);
+}
+function buildOuts(root, ctx){
+  const quizzes = [];
+  OUTS_SCENARIOS.forEach(sc=>{
+    const hole = sc.hole.map(([r,s])=>mkCard(r,s));
+    const board = sc.board.map(([r,s])=>mkCard(r,s));
+    const pct = sc.outs * (sc.streets===2 ? 4 : 2);
+    const visual = `<div class="hand-block"><div class="hand-label">ホールカード</div><div class="hand-row">${hole.map(cardHtml).join('')}</div></div>
+      <div class="hand-block"><div class="hand-label">ボード(${sc.streets===2?'フロップ':'ターンまで'})</div><div class="hand-row">${board.map(cardHtml).join('')}</div></div>
+      <div class="scenario-info">状況：<b>${sc.draw}</b></div>`;
+    const outsChoicesArr = numericChoices(sc.outs, 4, '枚');
+    quizzes.push({
+      visual,
+      q: 'この状況、役を完成させる「アウツ」は何枚？',
+      choices: outsChoicesArr,
+      correct: outsChoicesArr.indexOf(sc.outs+'枚'),
+      explain: `残りのカードの中で役を完成させるのは${sc.outs}枚です。`,
+    });
+    const pctChoicesArr = numericChoices(pct, 12, '%').map(s=>'約'+s);
+    quizzes.push({
+      visual,
+      q: `残り${sc.streets===2?'2枚(ターン・リバー)':'1枚(リバー)'}で完成する確率を「4-2ルール」(アウツ×${sc.streets===2?'4':'2'})で概算すると、およそ何％？`,
+      choices: pctChoicesArr,
+      correct: pctChoicesArr.indexOf('約'+pct+'%'),
+      explain: `${sc.outs}枚 × ${sc.streets===2?'4':'2'} ≈ ${pct}%(4-2ルールによる概算値)。`,
+    });
+  });
+  root.innerHTML = `${ctx.missionBoxHtml}<div class="quiz-head">✏️ クイズ：アウツとオッズを計算しよう</div><div id="quiz-area"></div>`;
+  renderQuizArea(qs('#quiz-area', root), shuffleArr(quizzes), ctx.complete);
+}
+
+/* =====================================================================
+   Stage 5: ポットオッズと期待値
+   ===================================================================== */
+const POTODDS_SCENARIOS = [
+  {pot:100,bet:50, equity:36, draw:'フラッシュドロー(9アウツ)'},
+  {pot:100,bet:100, equity:32, draw:'オープンエンド・ストレートドロー(8アウツ)'},
+  {pot:200,bet:40, equity:16, draw:'ガットショット(4アウツ)'},
+  {pot:50,bet:50, equity:60, draw:'コンボドロー(15アウツ)'},
+  {pot:300,bet:75, equity:18, draw:'フラッシュドロー・ターン(9アウツ)'},
+];
+function buildPotOdds(root, ctx){
+  const quizzes = POTODDS_SCENARIOS.map(sc=>{
+    const required = sc.bet/(sc.pot+sc.bet)*100;
+    const decision = sc.equity > required ? 'コール' : 'フォールド';
+    const visual = `<div class="scenario-info">
+      <span>ポット：<b>${sc.pot}</b></span>
+      <span>相手のベット：<b>${sc.bet}</b></span>
+      <span>あなたの勝率(エクイティ)：<b>${sc.equity}%</b></span>
+      <span>状況：<b>${sc.draw}</b></span>
+    </div>`;
+    const choices = ['コール','フォールド'];
+    return {
+      visual,
+      q: 'コール？ それともフォールド？',
+      choices,
+      correct: choices.indexOf(decision),
+      explain: `必要勝率(ポットオッズ) = ${sc.bet}/(${sc.pot}+${sc.bet}) ≈ ${required.toFixed(1)}%。あなたの勝率は${sc.equity}%なので、`
+        + (decision==='コール' ? '勝率の方が高く、コールが期待値プラス(+EV)です。' : '必要勝率に届かないため、フォールドが無難です。'),
+    };
+  });
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>ポットオッズの考え方</b><br>
+      必要勝率 = 相手のベット ÷ (ポット + 相手のベット) × 100<br>
+      → この必要勝率より、自分の勝率(エクイティ)が<b>高ければコール</b>、<b>低ければフォールド</b>が基本。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：コールかフォールドか判断しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: インプライドオッズ
+   (required-equity math verified in Node: the two worked examples below
+   genuinely flip fold->call once future winnings are added)
+   ===================================================================== */
+const IMPLIED_SCENARIOS = [
+  {pot:100, bet:50, future:100, equity:30, draw:'フラッシュドロー、フロップ'},
+  {pot:200, bet:100, future:0, equity:25, draw:'ストレートドロー、リバー(もう先がない)'},
+  {pot:60, bet:30, future:150, equity:20, draw:'ガットショット、フロップ'},
+  {pot:100, bet:100, future:50, equity:35, draw:'コンボドロー、ターン'},
+  {pot:90, bet:30, future:180, equity:18, draw:'フラッシュドロー、フロップ(相手のスタックが深い)'},
+];
+function buildImpliedOdds(root, ctx){
+  const quizzes = IMPLIED_SCENARIOS.map(sc=>{
+    const plainRequired = sc.bet/(sc.pot+sc.bet)*100;
+    const impliedRequired = sc.bet/(sc.pot+sc.bet+sc.future)*100;
+    const decision = sc.equity > impliedRequired ? 'コール' : 'フォールド';
+    const visual = `<div class="scenario-info">
+      <span>ポット：<b>${sc.pot}</b></span>
+      <span>相手のベット：<b>${sc.bet}</b></span>
+      <span>役が完成した後に見込める追加獲得額：<b>${sc.future}</b></span>
+      <span>あなたの勝率(エクイティ)：<b>${sc.equity}%</b></span>
+      <span>状況：<b>${sc.draw}</b></span>
+    </div>`;
+    const choices = ['コール','フォールド'];
+    return {
+      visual,
+      q: 'コール？ それともフォールド？',
+      choices,
+      correct: choices.indexOf(decision),
+      explain: `普通のポットオッズなら必要勝率は${sc.bet}/(${sc.pot}+${sc.bet})≈${plainRequired.toFixed(1)}%。`
+        + `でも今後さらに${sc.future}を見込めるなら、必要勝率は${sc.bet}/(${sc.pot}+${sc.bet}+${sc.future})≈${impliedRequired.toFixed(1)}%まで下がる。`
+        + `あなたの勝率は${sc.equity}%なので、`
+        + (decision==='コール' ? 'こちらの方が高く、コールが期待値プラス(+EV)です。' : 'それでも必要勝率に届かないため、フォールドが無難です。'),
+    };
+  });
+  quizzes.push(
+    {q:'インプライドオッズの考え方が特に効果を発揮しやすいのはどのタイミング？',
+      choices:['フロップなど早い段階(まだベットが残っている)','リバー(もうこれ以上ベットが続かない)'], correct:0,
+      explain:'まだ先のストリートがあるほど、役が完成した後に追加でお金を引き出せるチャンスが多い。リバーは最後のカードなので、追加で見込める金額は基本的に0になり、普通のポットオッズと同じになる。'},
+    {q:'役が完成した後に見込める「追加獲得額」の見積もりが大きいほど、必要勝率はどうなる？',
+      choices:['上がる(コールしにくくなる)','下がる(コールしやすくなる)','変わらない'], correct:1,
+      explain:'追加で見込める金額が大きいほど、「今すぐの見返り」が小さくても将来の見返りで元が取れるので、コールに必要な勝率のラインは下がる。'},
+  );
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>ポットオッズだけでは見落とすもの</b><br>
+      前のステージの「必要勝率」は、<b>今のポットと今のベット</b>だけを見た計算だった。
+      でも実際は、役が完成した後にもう1回・2回とベッティングラウンドが残っていることが多い。
+      相手が強い手を持っていれば、そこでさらにお金を払ってくれる(＝あなたが追加で獲得できる)かもしれない。
+      この「将来の見込み」まで加味した考え方が<b>インプライドオッズ</b>。
+    </div>
+    <div class="chen-box">
+      <b>公式は、必要勝率の式に「見込める追加獲得額」を足すだけ</b><br>
+      必要勝率(インプライドオッズ版) = ベット額 ÷ (ポット + ベット額 + 見込める追加獲得額) × 100<br>
+      例：ポット100・ベット50 → 普通の必要勝率は 50/(100+50)≈<b>33%</b>。もし完成後にさらに100を見込めるなら、
+      50/(100+50+100)≈<b>20%</b>まで下がる。勝率30%のドローなら、普通のポットオッズでは<b>フォールド</b>だったのに、
+      インプライドオッズで考えると<b>コール</b>に変わる。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：インプライドオッズで判断しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: レンジ思考とハンドリーディング
+   (range grid derived from the same simplified Chen formula used in
+   the starting-hand stage — thresholds verified in Node: score>=7 covers
+   40/169 combo-classes, score>=5 covers 80/169)
+   ===================================================================== */
+function rangeGridHtml(threshold, title){
+  let cells = '';
+  for(let i=0;i<13;i++){
+    for(let j=0;j<13;j++){
+      const a=14-i, b=14-j;
+      const hi=Math.max(a,b), lo=Math.min(a,b), suited=(a!==b) && (i<j);
+      const score = a===b ? chenScore(a,a,false) : chenScore(hi,lo,suited);
+      const included = score>=threshold;
+      const bucket = classifyBucket(score);
+      const label = a===b ? `${rankLabel(a)}${rankLabel(a)}` : (i<j ? `${rankLabel(hi)}${rankLabel(lo)}s` : `${rankLabel(hi)}${rankLabel(lo)}o`);
+      cells += `<div class="range-cell ${included ? 'bucket-'+bucket : 'bucket-out'}">${label}</div>`;
+    }
+  }
+  return `<div class="range-grid-block"><div class="range-grid-title">${title}</div><div class="range-grid">${cells}</div></div>`;
+}
+function buildRange(root, ctx){
+  const quizzes = [
+    {q:'レンジ表で「含まれるハンドの割合」が広いのは、アーリーとレイトのどちらのポジションが基本？',
+      choices:['アーリーポジション','レイトポジション(ボタンなど)'], correct:1,
+      explain:'ポジションが良い(遅い)ほど情報優位があるので、多少弱いハンドでも参加できる＝レンジが広くなる。'},
+    {q:'アーリーポジションの狭いレンジに含まれる可能性が高いのは？',
+      choices:['A♠A♥(プレミアム)','7♠2♥(弱い)'], correct:0,
+      explain:'アーリーポジションは情報が少なく不利なので、AAのようなプレミアムハンドに絞って参加するのが基本。'},
+    {q:'レイトポジションの広いレンジには含まれるが、アーリーポジションの狭いレンジには含まれない可能性が高いのは？',
+      choices:['K♠K♥(プレミアム)','8♠6♠(普通クラス)'], correct:1,
+      explain:'86sのような「普通」クラスのハンドは、情報優位のあるレイトポジションでは参加圏内だが、アーリーポジションでは見送られやすい。KKはどちらのレンジにも入るプレミアムハンド。'},
+    {q:'相手がアーリーポジションから参加してきた場合と、レイトポジションから参加してきた場合、平均してハンドが強いと推測すべきなのは？',
+      choices:['レイトポジションから参加してきた方','どちらも同じ','アーリーポジションから参加してきた方'], correct:2,
+      explain:'アーリーポジションはレンジが狭い(強いハンドに絞られている)ぶん、参加してきたこと自体が「平均して強いハンド」のサインになりやすい。'},
+    {q:'「1つの決め打ちのハンド」ではなく「レンジ(分布)」で相手を考える一番の利点は？',
+      choices:['相手の手が100%分かるようになる','情報が少なくても、判断の精度を上げられる','ポットが自動的に増える'], correct:1,
+      explain:'相手の正確な手は分からなくても、これまでの行動(ポジション・ベット等)から「あり得る手の範囲」を絞り込むことで、より精度の高い判断ができる。'},
+  ];
+  root.innerHTML = `
+    <div class="ref-head">📊 ポジションでレンジの広さが変わる</div>
+    <div class="range-grid-wrap">
+      ${rangeGridHtml(7, 'アーリーポジションの狭いレンジ(約24%)')}
+      ${rangeGridHtml(5, 'ボタンの広いレンジ(約47%)')}
+    </div>
+    <div class="range-legend">
+      <span class="range-legend-item"><span class="range-legend-swatch" style="background:#2f9e5c"></span>プレミアム</span>
+      <span class="range-legend-item"><span class="range-legend-swatch" style="background:#8fd1ab"></span>強い</span>
+      <span class="range-legend-item"><span class="range-legend-swatch" style="background:#f3e08a"></span>普通</span>
+      <span class="range-legend-item"><span class="range-legend-swatch" style="background:#eee6d3"></span>対象外</span>
+    </div>
+    <div class="chen-box">
+      <b>レンジ(範囲)で考える</b>とは、相手の手を「1つに決め打ち」せず「あり得るハンドの分布」で捉える技術。
+      前のステージで学んだハンド強さのランクは、そのままポジションごとの「参加レンジ」の目安になる——
+      アーリーポジションなら<b>プレミアム＋強い</b>だけ、レイトポジションなら<b>普通クラスまで</b>広げる、というように。
+      相手の行動(どのポジションから参加してきたか、ベットしたか)を積み重ねるほど、このレンジはどんどん絞り込まれていく。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：レンジ思考を確認しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: ブロッカー
+   (combo counts verified in Node: C(4,2)=6 total AA combos, C(3,2)=3
+   remain once one ace is removed from the deck)
+   ===================================================================== */
+const AA_COMBOS = [
+  {cards:[[14,'s'],[14,'h']], blocked:true},
+  {cards:[[14,'s'],[14,'d']], blocked:true},
+  {cards:[[14,'s'],[14,'c']], blocked:true},
+  {cards:[[14,'h'],[14,'d']], blocked:false},
+  {cards:[[14,'h'],[14,'c']], blocked:false},
+  {cards:[[14,'d'],[14,'c']], blocked:false},
+];
+function buildBlockers(root, ctx){
+  const combosHtml = AA_COMBOS.map(c=>`
+    <div class="blocker-combo ${c.blocked?'blocked':'possible'}">
+      <div class="hand-row">${c.cards.map(([r,s])=>cardHtml(mkCard(r,s))).join('')}</div>
+      <div class="blocker-combo-label">${c.blocked?'✕ ブロック済み':'○ まだ可能'}</div>
+    </div>`).join('');
+
+  const quizzes = [
+    {q:'誰も何も持っていない状態で、相手がAA(エースのペア)を持っている組み合わせは通常何通り？',
+      choices:['3通り','6通り','4通り','2通り'], correct:1,
+      explain:'デッキには4枚のエースがある。その中から2枚を選ぶ組み合わせは6通り(A♠A♥・A♠A♦・A♠A♣・A♥A♦・A♥A♣・A♦A♣)。'},
+    {q:'あなたがA♠(スペードのエース)を持っているとき、相手がAAを持っている組み合わせは何通りに減る？',
+      choices:['6通りのまま','4通り','3通り','0通り(絶対に持てない)'], correct:2,
+      explain:'A♠を含む3通り(A♠A♥・A♠A♦・A♠A♣)はあなたが握っているので相手には作れない。残るのは、あなたが持っていない3枚のエースだけで作れる3通り。可能性はちょうど半分に減る。'},
+    {q:'このように、自分の手札が「相手の持ちうる組み合わせを減らす」効果を持つカードを何と呼ぶ？',
+      choices:['キッカー','コネクター','ブラインド','ブロッカー'], correct:3,
+      explain:'相手の強い手の組み合わせを「ブロック(妨害)」しているカード、という意味で「ブロッカー」と呼ぶ。'},
+    {q:'ブロッカーを持っていてブラフを打つとき、そのブラフはどうなりやすい？',
+      choices:['相手の強い手が増えるので失敗しやすくなる','相手の強い手が減っている分、成功しやすくなる','特に変わらない'], correct:1,
+      explain:'相手が強い手(あなたがブロックしているハンド)を持っている可能性がもともと低いので、相手はコールしにくく、コールしてきても弱い手であることが多い。'},
+    {q:'前のステージで学んだ「レンジ」の考え方と、ブロッカーの関係は？',
+      choices:['ブロッカーとレンジは無関係','ブロッカーはレンジを常に2倍に広げる','ブロッカーは、相手のレンジの中から特定の組み合わせを除外する材料になる'], correct:2,
+      explain:'レンジ(あり得る手の分布)を考えるとき、自分の手札は「相手がその組み合わせを持てるかどうか」にも影響する。ブロッカーは、レンジをさらに絞り込むための材料になる。'},
+    {q:'そもそも、なぜ自分の手札が相手の組み合わせに影響するのか？',
+      choices:['自分の手札も、52枚のデッキのうちの2枚を占有しているから','ポーカーのルールで決まっているから(理由はない)','相手に手札が見えているから'], correct:0,
+      explain:'デッキは52枚しかない。自分がその2枚を持っている以上、相手が同じカードを持つことは絶対にできない。この「カードの取り合い」の効果が、ブロッカーの正体。'},
+  ];
+
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>自分の手札には、もう1つの役割がある</b><br>
+      これまでは自分の手札を「役を作る材料」として見てきた。でも実はもう1つ、
+      「相手が持てるカードを減らす」という役割もある。デッキは52枚しかないので、
+      自分がすでに持っているカードを、相手が同時に持つことは絶対にできない。
+    </div>
+    <div class="ref-head">🃏 具体例：あなたがA♠を持っているとき</div>
+    <div class="blocker-combo-grid">${combosHtml}</div>
+    <div class="chen-box">
+      6通りあったはずの相手のAAの組み合わせのうち、A♠を含む3通りはもう作れない。
+      残っているのは3通りだけ——つまり<b>相手がAAを持っている可能性は、もとの半分に減った</b>。
+      このように相手の組み合わせを減らすカードを<b>ブロッカー</b>と呼ぶ。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：ブロッカーの考え方を確認しよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: ベットサイジングとブラフの数学
+   (breakeven fold% is literally the pot-odds formula viewed from the
+   bettor's side — verified numerically in Node before writing this)
+   ===================================================================== */
+const BETSIZE_SCENARIOS = [
+  {pot:100, bet:33, label:'1/3ポットベット', pct:25, frac:'4回に1回'},
+  {pot:100, bet:50, label:'1/2ポットベット', pct:33, frac:'3回に1回'},
+  {pot:100, bet:100, label:'ポットベット(等倍)', pct:50, frac:'2回に1回'},
+  {pot:100, bet:200, label:'オーバーベット(2倍ポット)', pct:67, frac:'3回のうち2回'},
+  {pot:300, bet:75, label:'小さめのベット(1/4ポット)', pct:20, frac:'5回に1回'},
+];
+function buildBetSizing(root, ctx){
+  const quizzes = BETSIZE_SCENARIOS.map(sc=>{
+    const exact = sc.bet/(sc.pot+sc.bet)*100;
+    const visual = `<div class="scenario-info">
+      <span>ポット：<b>${sc.pot}</b></span>
+      <span>あなたのベット：<b>${sc.bet}</b></span>
+      <span>状況：<b>${sc.label}</b></span>
+    </div>`;
+    const choicesArr = numericChoices(sc.pct, 15, '%').map(s=>'約'+s);
+    return {
+      visual,
+      q: 'このベットが損得なし(損益分岐)になるために、相手が最低どれくらいの割合でフォールドしてくれる必要がある？',
+      choices: choicesArr,
+      correct: choicesArr.indexOf('約'+sc.pct+'%'),
+      explain: `${sc.bet} ÷ (${sc.pot}+${sc.bet}) ≈ ${exact.toFixed(1)}%(概算${sc.pct}%)。下の例と同じ考え方で言うと、「${sc.frac}」相手が降りてくれれば、損得なしのラインを超えます。`,
+    };
+  });
+  quizzes.push(
+    {q:'ベットを大きくする(ポットに対する割合を上げる)ほど、必要になる相手のフォールド率はどうなる？',
+      choices:['下がる','上がる','変わらない'], correct:1,
+      explain:'ベットが大きいほど、外れたときの損も大きい。だから「相手がこれくらいの割合で降りてくれないと割に合わない」というラインも上がる。'},
+    {q:'もし自分が「強い手のときしかベットしない」人だとバレたら、相手はどうしてくる？',
+      choices:['あなたがベットしても気にせずどんどんコールしてくる','特に変わらない','あなたがベットしたら素直に降り、あなたがチェックした時は強気に攻めてくる'], correct:2,
+      explain:'実は"読まれにくさ"も大事。強い手の時「だけ」ベットしていると、相手は「ベットされたら降りる(コールしても勝ち目が薄いから)、チェックされたら弱いと分かるので攻める」で簡単に対処できてしまう。せっかくの強い手でもコールしてもらえず、チェックした時は逆に攻められてしまう。だからこそ、たまにブラフも混ぜて「ベットされても本当に強いかどうか分からない」状態を保つ必要がある。'},
+  );
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>まず具体例で見てみよう：ポット100の場面で、50をブラフでベットしたら？</b><br>
+      あなたは勝てる見込みが薄い手だったが、思い切って50をベットした(いわゆる「ブラフ」)。相手の反応は「フォールド」か「コール」のどちらか。
+    </div>
+    <div class="bluff-trials">
+      <div class="bluff-trial">
+        <div class="bluff-trial-label">1回目：相手がフォールド</div>
+        <div class="bluff-trial-result plus">+100</div>
+        <div class="bluff-trial-desc">相手が降りたので、すでにあったポット100をそのまま獲得できる。</div>
+      </div>
+      <div class="bluff-trial">
+        <div class="bluff-trial-label">2回目：相手がコール</div>
+        <div class="bluff-trial-result minus">−50</div>
+        <div class="bluff-trial-desc">ブラフを見破られて負け。ベットした50を失う。</div>
+      </div>
+      <div class="bluff-trial">
+        <div class="bluff-trial-label">3回目：相手がコール</div>
+        <div class="bluff-trial-result minus">−50</div>
+        <div class="bluff-trial-desc">また見破られて負け。またベットした50を失う。</div>
+      </div>
+    </div>
+    <div class="chen-box">
+      <b>3回のうち1回だけ、相手が降りてくれれば……</b><br>
+      +100 − 50 − 50 = <b>0</b>。ちょうど損得なし(損益分岐)になる！<br>
+      つまりこのベットは、<b>「3回に1回」相手が降りてくれるだけで十分</b>、それより多く降りてくれるなら、むしろ得になる。<br>
+      この「3回に1回」を計算で求める式が：<br>
+      <b>ベット額 ÷ (ポット + ベット額) × 100</b> = 50 ÷ (100+50) × 100 ≈ <b>33%</b>(≒3回に1回)<br>
+      実はこれ、前のステージで習った「ポットオッズ(コールに必要な勝率)」と<b>まったく同じ式</b>。あちらは「コールする側」、こちらは「ベットする側」から見ただけの違い。
+    </div>
+    <div class="chen-box">
+      <b>ベットサイズを変えると、必要なフォールド率も変わる</b><br>
+      小さいベットほど、少しの回数フォールドしてもらえるだけで割に合う。大きいベットほど、たくさんフォールドしてもらわないと割に合わない——その代わり、フォールドしてもらえた時に獲得できる金額も大きくなる。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：ベットサイジングを計算してみよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   Stage: ボードテクスチャーとCベット戦略
+   (dry/wet classification verified in Node against a simple rule:
+   wet = flush draw possible OR ranks within a 4-span; matches intent
+   for all 6 example boards below)
+   ===================================================================== */
+const BOARD_EXAMPLES = [
+  {cards:[[13,'s'],[7,'d'],[2,'c']], texture:'dry', why:'3枚とも別々のスート(フラッシュドローなし)で、数字もバラバラ(ストレートも遠い)。'},
+  {cards:[[11,'s'],[10,'s'],[9,'h']], texture:'wet', why:'スペードが2枚(フラッシュドロー)、数字も連続(ストレートドロー多数)。'},
+  {cards:[[14,'h'],[8,'d'],[3,'c']], texture:'dry', why:'3枚とも別々のスートで、数字も大きく離れている。'},
+  {cards:[[9,'h'],[8,'h'],[7,'c']], texture:'wet', why:'ハートが2枚(フラッシュドロー)、数字も連続(ストレートドロー多数)。'},
+  {cards:[[12,'c'],[9,'s'],[4,'h']], texture:'dry', why:'3枚とも別々のスートで、数字もバラバラ。'},
+  {cards:[[12,'d'],[11,'d'],[4,'s']], texture:'wet', why:'ダイヤが2枚(フラッシュドロー)、Q-Jが連続(ストレートドローの芽もある)。'},
+];
+function buildBoardTexture(root, ctx){
+  const quizzes = BOARD_EXAMPLES.map(b=>{
+    const visual = `<div class="hand-row">${b.cards.map(([r,s])=>cardHtml(mkCard(r,s))).join('')}</div>`;
+    const choices = ['乾いている(ドライ)','濡れている(ウェット)'];
+    const correctIdx = b.texture==='dry' ? 0 : 1;
+    return {
+      visual,
+      q: 'この盤面(フロップ)は、乾いている？ それとも濡れている？',
+      choices,
+      correct: correctIdx,
+      explain: `${b.why}${b.texture==='dry' ? '役やドローがほとんど絡まないので「ドライ」。' : '役やドローがたくさん絡むので「ウェット」。'}`,
+    };
+  });
+  quizzes.push(
+    {q:'乾いた盤面(ドライ)では、プリフロップでレイズした人はどうするのが基本？',
+      choices:['ほとんどベットせず様子見するべき','高頻度・小さめのサイズでCベットしてよい','必ずポット以上ベットするべき'], correct:1,
+      explain:'ドライな盤面は相手のレンジにもあまり噛み合わない(強くなりにくい)ので、少額のベットでも相手を降ろしやすい。回数多く、小さめのサイズでCベットするのが基本戦略。'},
+    {q:'濡れた盤面(ウェット)でベットするとき、サイズはどうするのが基本？',
+      choices:['必ず小さくする','ベットしてはいけない','大きめにする'], correct:2,
+      explain:'ウェットな盤面は相手にもドロー(役の完成前の手)が多く絡む。小さすぎるベットだとドローを安くコールされてしまうので、大きめのサイズで「見合わない賭け」を強いる必要がある。'},
+    {q:'そもそも、なぜプリフロップのレイザーには「レンジ有利」があると言えるのか？',
+      choices:['レイズした人は常に一番強い手を持っているから','レイズした時点で、強いハンドに絞られたレンジになっているから','ポジションが必ず良いから'], correct:1,
+      explain:'前のステージで学んだ通り、レイズという行動そのものが「このレンジ表の中の、強い方のハンドです」という宣言になっている。だからこそ、相手のコールする側のレンジより平均して強く、盤面によってはCベットで押し切りやすい。'},
+  );
+  root.innerHTML = `
+    <div class="chen-box">
+      <b>盤面にも「乾いている」「濡れている」がある</b><br>
+      フロップの3枚が、役やドローにどれだけ絡みやすいかで、盤面の性質が変わる。<br>
+      <b>乾いている(ドライ)</b>：3枚が別々のスート(フラッシュドローなし)で、数字も離れている(ストレートドローも遠い)。誰の手にもあまり絡まない。<br>
+      <b>濡れている(ウェット)</b>：同じスートが2枚以上(フラッシュドロー)や、数字が連続(ストレートドロー)がある。いろいろな手に絡みやすい。
+    </div>
+    <div class="vs-row">
+      <div class="hand-block"><div class="hand-label">ドライな例</div><div class="hand-row">${[[13,'s'],[7,'d'],[2,'c']].map(([r,s])=>cardHtml(mkCard(r,s))).join('')}</div></div>
+      <div class="vs-divider">VS</div>
+      <div class="hand-block"><div class="hand-label">ウェットな例</div><div class="hand-row">${[[11,'s'],[10,'s'],[9,'h']].map(([r,s])=>cardHtml(mkCard(r,s))).join('')}</div></div>
+    </div>
+    <div class="chen-box">
+      <b>盤面の質でCベット(継続ベット)の判断が変わる</b><br>
+      プリフロップでレイズした人は、レンジ思考のステージで学んだ通り「強いハンドに絞られたレンジ」を持っている。
+      <b>ドライな盤面</b>ではこの差がそのまま出やすいので、高頻度・小さめのサイズでベット(Cベット)を続けやすい。
+      <b>ウェットな盤面</b>では相手のレンジにもドローが絡みやすくなるので、ベットの回数を絞ったり、
+      サイズを大きくしてドローに正しい対価を払わせたりする必要がある。
+    </div>
+    ${ctx.missionBoxHtml}
+    <div class="quiz-head">✏️ クイズ：盤面を読んでみよう</div>
+    <div id="quiz-area"></div>
+  `;
+  renderQuizArea(qs('#quiz-area', root), quizzes, ctx.complete);
+}
+
+/* =====================================================================
+   stage metadata
+   ===================================================================== */
+const STAGES = [
+  {
+    key:'starting', title:'スターティングハンド評価', sub:'配られた2枚の強さを見極める',
+    missionText:'配られた最初の2枚を4段階で評価しよう。6問正解でクリア。',
+    dialogue:[
+      {who:'coach', text:'ここからは「戦略編」だ。役の見分け方やテキサスホールデムの流れは「ルール編」で済んでいる前提で進めるよ。もしまだなら、右上の「📖 ルール編へ」から先にどうぞ。'},
+      {who:'coach', text:'勝負する前、配られた2枚だけで「参加すべきか」を判断する力が重要だ。プロが使う考え方を簡易版で紹介しよう。'},
+      {who:'stu', text:'AAとかKKは強そうって分かるんですけど、それ以外は難しいです…'},
+      {who:'coach', text:'「チェン・フォーミュラ」という点数化の考え方がある。高い数字ほど、ペアほど、同じスート(スーテッド)ほど、数字が近い(コネクター)ほど点数が上がる。点数で4段階に分けて考えてみよう。'},
+    ],
+    build: buildStarting,
+  },
+  {
+    key:'position', title:'ポジションの概念', sub:'座席によって有利さが変わる',
+    missionText:'座席(ポジション)による情報量の違いを確認し、6問正解でクリアしよう。',
+    dialogue:[
+      {who:'coach', text:'ハンドの強さだけじゃなく、「どこに座っているか」も勝率に関わってくる。「ポジション」という考え方を紹介しよう。'},
+      {who:'stu', text:'座席で勝率が変わるんですか？ カードは同じ強さなのに？'},
+      {who:'coach', text:'ああ。ポーカーは自分の手札だけでなく、相手の行動から得る情報も判断材料になる。行動の順番によって、得られる情報量が全然違うんだ。'},
+    ],
+    build: buildPosition,
+  },
+  {
+    key:'outs', title:'アウツとオッズ', sub:'残りカードで役ができる確率',
+    missionText:'5つの場面で「アウツの数」と「完成する確率」を見積もろう。10問すべて正解でクリア。',
+    dialogue:[
+      {who:'coach', text:'役があと少しで完成する状態を「ドロー」と呼ぶ。役を完成させてくれる残りカードの枚数を「アウツ」というんだ。'},
+      {who:'stu', text:'アウツが分かると何が嬉しいんですか？'},
+      {who:'coach', text:'アウツの枚数から、大まかな完成確率が計算できる。「4-2ルール」——残り2枚見られるならアウツ×4%、残り1枚ならアウツ×2%、これだけで概算できるんだ。'},
+    ],
+    build: buildOuts,
+  },
+  {
+    key:'potodds', title:'ポットオッズと期待値', sub:'コールすべきか、降りるべきか',
+    missionText:'ポットの大きさと相手のベット額から「コール」か「フォールド」かを判断しよう。5問正解でクリア。',
+    dialogue:[
+      {who:'coach', text:'アウツから勝率(エクイティ)が見積もれたら、最後は「コールする価値があるか」を計算しよう。'},
+      {who:'stu', text:'ポットオッズ、ですね。名前は聞いたことあります。'},
+      {who:'coach', text:'必要勝率 = 相手のベット ÷ (ポット + 相手のベット) × 100。これより自分の勝率が高ければコール、低ければフォールドが基本だ。'},
+    ],
+    build: buildPotOdds,
+  },
+  {
+    key:'impliedodds', title:'インプライドオッズ', sub:'将来の見込みまで加味してコール判断する',
+    missionText:'「今のポットオッズ」だけでなく「将来の見込み」まで加味してコール判断しよう。7問正解でクリア。',
+    dialogue:[
+      {who:'coach', text:'ポットオッズは便利だけど、実は「今のポット」しか見ていない。もう一歩進んだ考え方を紹介しよう。'},
+      {who:'stu', text:'今のポットだけじゃダメなんですか？'},
+      {who:'coach', text:'ドローが完成した後も、まだベッティングラウンドが残っていることが多い。そこで相手からさらに引き出せる見込み額まで含めて考えるのが「インプライドオッズ」だ。'},
+    ],
+    build: buildImpliedOdds,
+  },
+  {
+    key:'range', title:'レンジ思考とハンドリーディング', sub:'相手の手を「分布」で考える',
+    missionText:'ポジションによってレンジ(参加するハンドの範囲)が変わることを確認し、5問正解でクリアしよう。',
+    dialogue:[
+      {who:'coach', text:'ここまでは相手の手を意識せず、自分のハンドとオッズだけで考えてきた。次は一歩進んで、相手の手を「レンジ」で読む技術を紹介しよう。'},
+      {who:'stu', text:'相手が何を持っているか、当てるということですか？'},
+      {who:'coach', text:'1つに決め打ちはしない。「ポジションやここまでの行動から考えて、あり得る手の範囲はこのあたりだ」と分布で捉えるんだ。ポジションが良いほど、その範囲は広くなる。'},
+    ],
+    build: buildRange,
+  },
+  {
+    key:'blockers', title:'ブロッカー', sub:'自分の手札が相手の可能性を減らす',
+    missionText:'具体例で「組み合わせが減る」感覚をつかんでから、6問正解でクリアしよう。',
+    dialogue:[
+      {who:'coach', text:'レンジの考え方に、もう1つ武器を追加しよう。実は自分の手札そのものが、相手のレンジを絞り込むヒントになるんだ。'},
+      {who:'stu', text:'自分の手札で、相手のことが分かるんですか？'},
+      {who:'coach', text:'ああ。デッキは52枚しかない。自分がすでに2枚持っていたら、相手が同じカードを持つことは絶対にできない——この仕組みを「ブロッカー」と呼ぶ。具体例で見てみよう。'},
+    ],
+    build: buildBlockers,
+  },
+  {
+    key:'betsizing', title:'ベットサイジングとブラフの数学', sub:'掛け金の大きさにも計算式がある',
+    missionText:'具体例で「損得なしのライン」を体感してから、7問正解でクリアしよう。',
+    dialogue:[
+      {who:'coach', text:'最後に、「いくら賭けるか」自体にも数学があることを紹介しよう。'},
+      {who:'stu', text:'コールするかどうかの式は習いましたけど、ベット額を決める式もあるんですか？'},
+      {who:'coach', text:'ある。でも先に数式を出すと分かりにくいから、まずは具体的な数字で見てみよう。「ブラフしたけど何回かに1回は見破られる」という状況を、3回繰り返した場合で考えてみるんだ。'},
+      {who:'stu', text:'なるほど、まず数を数えてみるんですね。'},
+      {who:'coach', text:'そう。下の例を1つずつ読んでみて。最後にちゃんと式にまとめるから安心して。'},
+    ],
+    build: buildBetSizing,
+  },
+  {
+    key:'boardtexture', title:'ボードテクスチャーとCベット戦略', sub:'フロップの質でベット判断を変える',
+    missionText:'盤面が「乾いている」か「濡れている」かを見極めて、9問正解でクリアしよう。',
+    dialogue:[
+      {who:'coach', text:'最後の仕上げに、ここまでの知識を1つにまとめる考え方を紹介しよう。「盤面(フロップ)の質」だ。'},
+      {who:'stu', text:'盤面にも良し悪しがあるんですか？'},
+      {who:'coach', text:'ドローが絡みやすい「濡れた」盤面と、あまり絡まない「乾いた」盤面がある。レンジ・ベットサイジング・ブロッカー、ここまで学んだことが全部ここに関わってくるんだ。'},
+    ],
+    build: buildBoardTexture,
+  },
+];
+
+/* ---------- shared state / persistence ---------- */
+const STORE_KEY = 'pokerQuestProgress';
+const state = { unlocked:1, cleared:new Set(), currentIndex:0 };
+
+function loadProgress(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if(raw){
+      state.unlocked = raw.unlocked || 1;
+      state.cleared = new Set(raw.cleared || []);
+    }
+  }catch(e){}
+  if (new URLSearchParams(location.search).has('all')) state.unlocked = STAGES.length;
+}
+function saveProgress(){
+  localStorage.setItem(STORE_KEY, JSON.stringify({unlocked:state.unlocked, cleared:[...state.cleared]}));
+}
+
+/* ---------- sidebar / header ---------- */
+function renderSidebar(){
+  const list = qs('#side-list');
+  list.innerHTML = STAGES.map((s,i)=>{
+    const locked = i > state.unlocked - 1;
+    const cleared = state.cleared.has(i);
+    const active = i === state.currentIndex;
+    const icon = cleared ? '✅' : locked ? '🔒' : '🃏';
+    return `<div class="side-item ${active?'active':''} ${locked?'locked':''}" data-index="${i}">
+      <span class="side-icon">${icon}</span>
+      <span class="side-text">
+        <div class="side-main">第${i+1}ステージ ${s.title}</div>
+        <div class="side-sub">${s.sub}</div>
+      </span>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.side-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const i = Number(item.dataset.index);
+      if(i > state.unlocked - 1) return;
+      mountStage(i);
+    });
+  });
+
+  qs('#progress-label').textContent = `クリア ${state.cleared.size} / ${STAGES.length}`;
+  qs('#progress-fill').style.width = (state.cleared.size / STAGES.length * 100) + '%';
+}
+
+qs('#btn-reset-all').addEventListener('click', ()=>{
+  if(!confirm('進行状況をすべてリセットして最初からやり直しますか？')) return;
+  state.unlocked = 1; state.cleared = new Set();
+  saveProgress();
+  mountStage(0);
+});
+
+/* ---------- sidebar drawer toggle (mobile off-canvas / tablet icon-rail) ---------- */
+function toggleSidebar(){ qs('#app-shell').classList.toggle('side-collapsed'); }
+qs('#sidebar-toggle').addEventListener('click', toggleSidebar);
+qs('#head-nav-toggle').addEventListener('click', toggleSidebar);
+qs('#side-backdrop').addEventListener('click', ()=> qs('#app-shell').classList.add('side-collapsed'));
+
+/* ---------- stage mount / navigation ---------- */
+function missionBoxHtml(meta, index){
+  return `<div class="mission-box">
+      <div class="mission-label">🎯 お題</div>
+      <div class="mission-text">${meta.missionText}</div>
+      <div class="mission-status" id="mission-status">${state.cleared.has(index) ? '達成！' : '未達成'}</div>
+    </div>`;
+}
+function mountStage(index){
+  state.currentIndex = index;
+  const meta = STAGES[index];
+  const main = qs('#main-area');
+  main.innerHTML = `
+    <div class="chapter-head">
+      <span class="chapter-badge">第${index+1}ステージ</span><span class="chapter-title">${meta.title}</span>
+      <div class="chapter-sub">${meta.sub}</div>
+    </div>
+    <div class="dialogue-scene">${renderDialogue(meta.dialogue)}</div>
+    <div class="stage-play" id="stage-play"></div>
+    <div class="stage-nav">
+      <button class="btn" id="btn-retry">↺ このステージをやり直す</button>
+      <button class="btn btn-primary" id="btn-next" ${state.cleared.has(index) ? '' : 'disabled'}>
+        ${index === STAGES.length-1 ? 'クリア画面へ ▶' : 'つぎのステージへ ▶'}
+      </button>
+    </div>
+  `;
+
+  qs('#btn-retry').addEventListener('click', ()=> mountStage(index));
+  qs('#btn-next').addEventListener('click', ()=>{
+    if(index === STAGES.length-1) showEnding();
+    else mountStage(index+1);
+  });
+
+  const ctx = {
+    missionBoxHtml: missionBoxHtml(meta, index),
+    complete(){
+      if(state.cleared.has(index)) return;
+      state.cleared.add(index);
+      state.unlocked = Math.max(state.unlocked, index+2);
+      saveProgress();
+      const statusEl = qs('#mission-status');
+      statusEl.textContent = '達成！';
+      statusEl.classList.add('ok');
+      qs('#btn-next').removeAttribute('disabled');
+      renderSidebar();
+    },
+  };
+  meta.build(qs('#stage-play'), ctx);
+  if(state.cleared.has(index)) qs('#mission-status')?.classList.add('ok');
+  linkGlossaryIn(main);
+  renderSidebar();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showEnding(){
+  const main = qs('#main-area');
+  main.innerHTML = `
+    <div class="ending">
+      <h2>🃏 POKER QUEST 戦略編 制覇！</h2>
+      <p>ポジション、スターティングハンド評価、アウツとオッズ、ポットオッズ、インプライドオッズ、レンジ思考、ブロッカー、ベットサイジングの数学、ボードテクスチャーまで——「ルール編」で学んだ基礎の先にある、駆け引きの土台を一通り学んだね。</p>
+      <div class="ending-list">
+        ✅ ポジションが良い(遅く行動できる)ほど、相手の情報を先に得られて有利<br>
+        ✅ スターティングハンドの強さは、高さ・ペア・スーテッド・数字の近さで簡易的に点数化できる<br>
+        ✅ アウツ×4(残り2枚)、アウツ×2(残り1枚)で完成確率を概算できる(4-2ルール)<br>
+        ✅ 必要勝率(ポットオッズ) &lt; 自分の勝率(エクイティ) ならコール、逆ならフォールドが基本<br>
+        ✅ インプライドオッズ：将来さらに引き出せる見込み額まで加味すると、必要勝率はもっと下がる<br>
+        ✅ レンジ(相手が持ちうる手の分布)で考えると、1つの決め打ちより判断の精度が上がる<br>
+        ✅ ブロッカー：自分の手札は、相手が持てる組み合わせも減らしている<br>
+        ✅ ベット額÷(ポット+ベット額)は、コール側の必要勝率とベット側のブラフ損益分岐フォールド率、両方に使える式<br>
+        ✅ 盤面が乾いている(ドライ)か濡れている(ウェット)かで、Cベットの頻度とサイズを変える
+      </div>
+      <div class="choice-list" style="justify-content:center">
+        <a class="btn btn-primary" href="challenge.html">⚔️ 総合チャレンジ(CPU対戦)へ ▶</a>
+        <button class="btn" id="btn-replay">↺ はじめから学びなおす</button>
+      </div>
+    </div>
+  `;
+  linkGlossaryIn(main);
+  qs('#btn-replay').addEventListener('click', ()=>{
+    state.unlocked = 1; state.cleared = new Set();
+    saveProgress();
+    mountStage(0);
+  });
+  state.currentIndex = -1;
+  renderSidebar();
+}
+
+/* ---------- book recommendation ---------- */
+const BOOK_RECOMMEND = {
+  title: 'フィル・ゴードン『フィル・ゴードンのポーカー攻略法 入門編』(カジノブックシリーズ)',
+  url: 'https://www.amazon.co.jp/dp/4775949012?tag=senjin-22',
+};
+function renderBookRecommend(){
+  const el = qs('#book-recommend');
+  if(!el) return;
+  el.innerHTML = `
+    <p class="book-recommend-label">参考文献</p>
+    <p class="book-recommend-lead">ゲームだけでは物足りない方へ。世界的プレイヤーが書いた定番の入門書でさらに深く学べる。</p>
+    <a href="${BOOK_RECOMMEND.url}" target="_blank" rel="sponsored noopener">${escapeHtml(BOOK_RECOMMEND.title)}</a>
+  `;
+}
+
+/* ---------- boot ---------- */
+loadProgress();
+mountStage(Math.min(state.currentIndex, state.unlocked-1));
+renderBookRecommend();
+</script>
+</body>
+</html>
