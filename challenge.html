@@ -211,6 +211,7 @@ a.head-reset{text-decoration:none;display:inline-flex;align-items:center}
 .oval-seat.busted{opacity:.3}
 .oval-seat.you{background:rgba(217,164,65,.25);border:1px solid var(--gold);min-width:108px}
 .oval-seat.turn{outline:2px dashed #f3d99a;box-shadow:0 0 0 4px rgba(243,217,154,.2)}
+.oval-seat.winner{outline:2px solid #8ef0b0;box-shadow:0 0 0 5px rgba(142,240,176,.3)}
 .oval-seat-name{color:#fff;font-size:11px;font-weight:900;margin-bottom:2px;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
 .oval-seat-pos{display:inline-block;font-size:8.5px;font-weight:950;color:#123;background:#e8c07f;border-radius:4px;padding:1px 4px}
 .oval-seat-stack{color:#f3d99a;font-size:10px;font-weight:800;margin-bottom:4px}
@@ -790,13 +791,14 @@ function buildFinal(root, ctx){
     render({paused:true, resultInfo});
   }
 
-  function seatHtml(key, isTurn, reveal){
+  function seatHtml(key, isTurn, reveal, isWinner){
     const alive = bankroll[key]>0;
     const cls = ['oval-seat'];
     if(key==='you') cls.push('you');
     if(!alive) cls.push('busted');
     else if(H.alive.includes(key) && H.folded.has(key)) cls.push('folded');
     if(isTurn) cls.push('turn');
+    if(isWinner) cls.push('winner');
     const posTag = alive && H.alive.includes(key) ? (H.posTags[key]||'') : '';
     const showFace = key==='you' || (reveal && H.alive.includes(key) && !H.folded.has(key));
     // Your own folded hand stays visible (dimmed via the seat's .folded opacity)
@@ -823,7 +825,12 @@ function buildFinal(root, ctx){
     const highlightKey = opts.resultInfo ? null : (turnKey || lastActorKey);
     const potNow = ALL_KEYS.reduce((s,k)=>s+H.committed[k],0);
     const reveal = !!(opts.resultInfo && !opts.resultInfo.folded);
-    const seatsHtml = ALL_KEYS.map(k=> seatHtml(k, highlightKey===k, reveal)).join('');
+    const winnerKeys = new Set();
+    if(opts.resultInfo){
+      if(opts.resultInfo.folded) winnerKeys.add(opts.resultInfo.winner);
+      else opts.resultInfo.potResults.forEach(p=> p.winners.forEach(w=> winnerKeys.add(w)));
+    }
+    const seatsHtml = ALL_KEYS.map(k=> seatHtml(k, highlightKey===k, reveal, winnerKeys.has(k))).join('');
     const centerHtml = `<div class="poker-round-center">
         <div class="hand-row">${H.board.map(cardHtml).join('') || ''}</div>
         <div class="poker-round-pot">🪙 ポット ${potNow}</div>
