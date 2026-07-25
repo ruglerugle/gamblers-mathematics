@@ -126,9 +126,10 @@ a.head-reset{text-decoration:none;display:inline-flex;align-items:center}
 .dialog-row.right .dialog-character{order:2}
 .dialog-row.right .dialog-bubble{order:1}
 .dialog-character{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0}
-.dialog-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 3px 6px rgba(0,0,0,.18);flex-shrink:0}
+.dialog-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 3px 6px rgba(0,0,0,.18);flex-shrink:0;overflow:hidden}
 .dialog-avatar.coach{background:linear-gradient(#fde3d6,#f7c2a4)}
 .dialog-avatar.stu{background:linear-gradient(#dcefe9,#b9dcd0)}
+.dialog-avatar img{width:100%;height:100%;object-fit:cover}
 .dialog-name{padding:3px 10px;border-radius:7px;color:#fff;font-weight:900;font-size:11px;line-height:1.2;box-shadow:0 2px 0 rgba(0,0,0,.16);white-space:nowrap;text-align:center}
 .dialog-name.coach{background:linear-gradient(#f0b868,#c19a3a)}
 .dialog-name.stu{background:linear-gradient(#5cc2ab,#2f8f78)}
@@ -492,10 +493,10 @@ function catDisplayName(ev){ return (ev.cat===8 && ev.tie[0]===14) ? 'ロイヤ�
 function renderDialogue(lines){
   return lines.map(l=>{
     const isStu = l.who === 'stu';
-    const icon = l.who==='coach' ? '🎩' : '🔰';
+    const img = l.who==='coach' ? '../images/cat.png' : '../images/rabbit.png';
     const name = l.who==='coach' ? 'コーチ' : 'ミカ（見習い）';
     return `<div class="dialog-row${isStu?' right':''}">
-      <div class="dialog-character"><div class="dialog-avatar ${l.who}">${icon}</div><div class="dialog-name ${l.who}">${name}</div></div>
+      <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
       <div class="dialog-bubble">${l.text}</div>
     </div>`;
   }).join('');
