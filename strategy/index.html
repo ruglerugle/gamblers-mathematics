@@ -627,9 +627,12 @@ function classifyBucket(score){ if(score>=10) return 'premium'; if(score>=7) ret
    dialogue renderer
    ===================================================================== */
 function renderDialogue(lines){
+  let coachTurn = 0, stuTurn = 0;
   return lines.map(l=>{
     const isStu = l.who === 'stu';
-    const img = l.who==='coach' ? '../images/cat.png' : '../images/rabbit.png';
+    let img;
+    if(l.who==='coach'){ img = (coachTurn++ % 2===0) ? '../images/cat.png' : '../images/catThink.png'; }
+    else { img = (stuTurn++ % 2===0) ? '../images/rabbit.png' : '../images/rabbitThink.png'; }
     const name = l.who==='coach' ? 'コーチ' : 'ミカ（見習い）';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
