@@ -799,7 +799,11 @@ function buildFinal(root, ctx){
     if(isTurn) cls.push('turn');
     const posTag = alive && H.alive.includes(key) ? (H.posTags[key]||'') : '';
     const showFace = key==='you' || (reveal && H.alive.includes(key) && !H.folded.has(key));
-    const cardsHtml = (!alive || !H.alive.includes(key) || H.folded.has(key)) ? '' : (H.hole[key]||[]).map(c=> showFace ? cardHtml(c) : '<div class="pcard back"></div>').join('');
+    // Your own folded hand stays visible (dimmed via the seat's .folded opacity)
+    // so you can still see what you gave up; other players' folded hands stay
+    // hidden/mucked, matching real poker.
+    const cardsHidden = !alive || !H.alive.includes(key) || (H.folded.has(key) && key!=='you');
+    const cardsHtml = cardsHidden ? '' : (H.hole[key]||[]).map(c=> showFace ? cardHtml(c) : '<div class="pcard back"></div>').join('');
     const tag = !alive ? ''
       : H.folded.has(key) ? '<span class="oval-seat-tag fold">フォールド</span>'
       : H.allIn.has(key) ? '<span class="oval-seat-tag allin">オールイン</span>' : '';
