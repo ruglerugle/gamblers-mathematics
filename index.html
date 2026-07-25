@@ -73,9 +73,10 @@
     border-radius:14px;
     overflow:hidden;
     background:
-      radial-gradient(240px 190px at 14% 78%, rgba(94,200,255,.16), transparent 70%),
-      radial-gradient(240px 190px at 50% 46%, rgba(126,224,127,.15), transparent 70%),
-      radial-gradient(240px 190px at 86% 16%, rgba(240,149,95,.17), transparent 70%),
+      radial-gradient(240px 190px at 10% 14%, rgba(94,200,255,.16), transparent 70%),
+      radial-gradient(240px 190px at 36% 35%, rgba(126,224,127,.15), transparent 70%),
+      radial-gradient(240px 190px at 64% 58%, rgba(240,149,95,.16), transparent 70%),
+      radial-gradient(240px 190px at 90% 80%, rgba(180,140,255,.17), transparent 70%),
       linear-gradient(160deg,#0b1122,#131c33 55%,#0b1122);
   }
   .map svg.terrain{position:absolute;inset:0;width:100%;height:100%}
@@ -95,7 +96,7 @@
   .trail-glow{fill:none;stroke:var(--gold);stroke-width:.9;opacity:.25;filter:blur(2px)}
   .trail{fill:none;stroke:var(--gold);stroke-width:.55;stroke-linecap:round;stroke-dasharray:2.2 2.6;opacity:.85}
 
-  .flag{position:absolute;left:14%;top:78%;transform:translate(-50%,-100%);font-size:26px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+  .flag{position:absolute;left:10%;top:14%;transform:translate(-50%,-100%);font-size:26px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
   .flag .label{position:absolute;top:100%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:var(--gold);letter-spacing:.1em;margin-top:2px}
 
   .node{
@@ -140,10 +141,12 @@
     box-shadow:0 0 0 4px rgba(8,11,22,.55), 0 0 26px 2px var(--accent), 0 10px 16px -6px rgba(0,0,0,.7);
   }
 
-  /* Node position presets (3-stop trail: rules → strategy → challenge) */
-  .n1{left:14%; top:78%}
-  .n2{left:50%; top:46%}
-  .n3{left:86%; top:16%}
+  /* Node position presets (4-stop trail, top-left → bottom-right:
+     rules → strategy → challenge → world guide) */
+  .n1{left:10%; top:14%}
+  .n2{left:36%; top:35%}
+  .n3{left:64%; top:58%}
+  .n4{left:90%; top:80%}
 
   .compass{position:absolute;top:14px;right:16px;width:44px;height:44px;opacity:.75}
 
@@ -209,7 +212,7 @@
   <header>
     <span class="eyebrow">FREE BROWSER POKER GAME</span>
     <h1>🃏 POKER QUEST</h1>
-    <p>役の見分け方から実戦の駆け引きまで。地図をたどって、テキサスホールデムを3つのクエストで学ぼう。</p>
+    <p>役の見分け方から実戦の駆け引き、世界大会への挑戦まで。地図をたどって、テキサスホールデムを4つのクエストで学ぼう。</p>
   </header>
 
   <div class="map-frame">
@@ -218,21 +221,21 @@
       <div class="grid-lines"></div>
 
       <svg class="terrain" viewBox="0 0 100 60" preserveAspectRatio="none">
-        <path class="trail-glow" d="M14,46.8 C24,42 30,40 38,34 C44,29.6 40,32 50,27.6 C58,23.9 62,20 68,16.4 C74,12.8 80,13 86,9.6"/>
-        <path class="trail" d="M14,46.8 C24,42 30,40 38,34 C44,29.6 40,32 50,27.6 C58,23.9 62,20 68,16.4 C74,12.8 80,13 86,9.6"/>
+        <path class="trail-glow" d="M10,8.4 C20,12 26,16 36,21 C44,25 52,29 64,34.8 C72,38.5 80,42.5 90,48"/>
+        <path class="trail" d="M10,8.4 C20,12 26,16 36,21 C44,25 52,29 64,34.8 C72,38.5 80,42.5 90,48"/>
       </svg>
 
       <!-- decorative scenery -->
-      <span class="deco" style="left:6%;top:60%" aria-hidden="true">🏘️</span>
-      <span class="deco" style="left:22%;top:88%" aria-hidden="true">♠️</span>
-      <span class="deco" style="left:30%;top:60%" aria-hidden="true">♥️</span>
-      <span class="deco" style="left:38%;top:82%" aria-hidden="true">🪙</span>
-      <span class="deco" style="left:44%;top:60%" aria-hidden="true">♦️</span>
-      <span class="deco" style="left:58%;top:60%" aria-hidden="true">♣️</span>
-      <span class="deco" style="left:64%;top:36%" aria-hidden="true">🍀</span>
-      <span class="deco" style="left:72%;top:52%" aria-hidden="true">💰</span>
-      <span class="deco" style="left:78%;top:30%" aria-hidden="true">🎩</span>
-      <span class="deco" style="left:92%;top:36%" aria-hidden="true">🏆</span>
+      <span class="deco" style="left:4%;top:8%" aria-hidden="true">🏘️</span>
+      <span class="deco" style="left:18%;top:24%" aria-hidden="true">♠️</span>
+      <span class="deco" style="left:26%;top:14%" aria-hidden="true">♥️</span>
+      <span class="deco" style="left:32%;top:44%" aria-hidden="true">🪙</span>
+      <span class="deco" style="left:42%;top:24%" aria-hidden="true">♦️</span>
+      <span class="deco" style="left:50%;top:46%" aria-hidden="true">♣️</span>
+      <span class="deco" style="left:56%;top:28%" aria-hidden="true">🍀</span>
+      <span class="deco" style="left:70%;top:68%" aria-hidden="true">💰</span>
+      <span class="deco" style="left:76%;top:44%" aria-hidden="true">🎩</span>
+      <span class="deco" style="left:96%;top:64%" aria-hidden="true">🌍</span>
 
       <div class="flag" aria-hidden="true">🚩<span class="label">START</span></div>
 
@@ -268,6 +271,14 @@
          data-tags="実戦,CPU対戦" data-num="3">
         <div class="badge" style="--accent:#f0955f">⚔️<span class="num">3</span></div>
         <div class="label">総合チャレンジ</div>
+      </a>
+
+      <a class="node n4" href="https://ruglerugle.github.io/poker-worldchamp-guide/"
+         data-accent="#b48cff" data-icon="🏆" data-sub="WORLD GUIDE" data-title="世界大会ガイド"
+         data-desc="WSOPをはじめとする世界大会のエントリー方法・大会形式・賞金の仕組みまで、実際に挑戦するための完全ガイド。"
+         data-tags="世界大会,エントリー&賞金" data-num="4">
+        <div class="badge" style="--accent:#b48cff">🏆<span class="num">4</span></div>
+        <div class="label">世界大会ガイド</div>
       </a>
 
     </div>
