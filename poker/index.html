@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#060b09">
+<meta name="theme-color" content="#0d4b32">
 <title>ギャンブラーのための数学（ポーカー編）― POKER QUEST ―</title>
 <meta name="description" content="役の見分け方から実戦の駆け引き、世界大会への挑戦まで。ギャンブラーのための数学をテキサスホールデムで学べる無料ブラウザ学習ゲーム。ルール編・戦略編・総合チャレンジ・世界大会ガイドの4クエスト。">
 <style>
@@ -677,6 +677,143 @@
     html{scroll-behavior:auto}
     *,*::before,*::after{transition-duration:.01ms!important}
   }
+
+  /* Lesson palette: emerald felt + warm paper */
+  :root{
+    --black:#0b3d29;
+    --black-2:#0d4b32;
+    --felt:#0f6b3f;
+    --felt-2:#0a5335;
+    --ivory:#fffaf0;
+    --muted:#d6e6df;
+    --muted-2:#a9c4b8;
+    --gold:#d9a441;
+    --gold-light:#f3d99a;
+    --gold-line:rgba(166,116,42,.38);
+    --panel:#f6f1e2;
+  }
+
+  body{
+    color:var(--ivory);
+    background:
+      radial-gradient(950px 560px at 18% -4%,rgba(35,139,91,.58),transparent 66%),
+      radial-gradient(800px 540px at 92% 20%,rgba(217,164,65,.13),transparent 70%),
+      linear-gradient(145deg,#116b46,#0d4b32 48%,#052e1e);
+  }
+
+  body::before{
+    opacity:.3;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  }
+
+  .topbar{border-bottom-color:rgba(255,255,255,.18)}
+  .brand-mark::before,.brand-mark::after{
+    border-color:var(--gold-light);
+    background:#0b3d29;
+  }
+  .brand-copy small{color:#bed4ca}
+  .top-status{color:#dcebe5}
+  .top-status::before{
+    background:#f0ce72;
+    box-shadow:0 0 12px rgba(240,206,114,.75);
+  }
+
+  .eyebrow{color:var(--gold-light)}
+  .eyebrow::before{background:var(--gold-light)}
+  h1{color:#fffdf7;text-shadow:0 4px 20px rgba(2,27,17,.18)}
+  h1 .edition{color:var(--gold-light)}
+  .hero-lead{color:#e0eee8}
+  .meta-chip{
+    border-color:rgba(255,255,255,.24);
+    color:#f1f7f4;
+    background:rgba(255,255,255,.08);
+  }
+
+  .dealer-seal{
+    border-color:rgba(243,217,154,.62);
+    box-shadow:
+      0 0 0 18px rgba(243,217,154,.035),
+      0 0 0 19px rgba(243,217,154,.2),
+      0 36px 80px rgba(1,30,18,.32),
+      inset 0 0 60px rgba(2,48,29,.24);
+  }
+  .dealer-seal::before,.dealer-seal::after{background:rgba(243,217,154,.42)}
+  .seal-center strong,.seal-suit{color:var(--gold-light)}
+  .seal-center small{color:#d7e8e0}
+
+  .quest-board{
+    color:#24362e;
+    border-color:rgba(166,116,42,.5);
+    background:
+      radial-gradient(650px 360px at var(--mx,50%) var(--my,0%),rgba(17,107,70,.1),transparent 72%),
+      linear-gradient(145deg,#fffdf6,#f1ead8);
+    box-shadow:
+      0 42px 90px rgba(2,31,19,.3),
+      inset 0 1px rgba(255,255,255,.9);
+  }
+  .quest-board::before{border-color:rgba(166,116,42,.16)}
+  .board-head{border-bottom-color:rgba(36,54,46,.14)}
+  .section-kicker{color:#a6742a}
+  .board-head h2{color:#1d3229}
+  .board-head p{color:#6f7d75}
+
+  .quest-card{
+    color:#263a31;
+    border-color:#d9cfb7;
+    background:
+      linear-gradient(135deg,rgba(255,255,255,.95),rgba(246,241,226,.7)),
+      #fffdf6;
+    box-shadow:0 8px 22px rgba(42,55,48,.07);
+  }
+  .quest-card::before{color:rgba(25,54,41,.035)}
+  .quest-card:hover,
+  .quest-card:focus-visible,
+  .quest-card.active{
+    border-color:color-mix(in srgb,var(--accent) 58%,#d9cfb7);
+    background:#eef7f2;
+    box-shadow:0 16px 30px rgba(30,72,53,.13);
+  }
+  .quest-card:hover::before,
+  .quest-card:focus-visible::before,
+  .quest-card.active::before{
+    color:color-mix(in srgb,var(--accent) 10%,transparent);
+  }
+  .card-main small,.card-tag{color:#718078}
+  .card-main h3{color:#20372d}
+  .card-main p{color:#66756d}
+  .card-arrow{
+    border-color:rgba(35,59,48,.2);
+    color:#28483a;
+    background:rgba(255,255,255,.5);
+  }
+
+  .quest-detail{
+    border-color:#d8ccb0;
+    color:#253a31;
+    background:linear-gradient(135deg,#fffdf7,#f4edda);
+    box-shadow:inset 0 1px rgba(255,255,255,.9);
+  }
+  .detail-copy h3{color:#20372d}
+  .detail-copy p{color:#68776f}
+  .detail-cta{
+    border-color:#a6742a;
+    color:#fff;
+    background:linear-gradient(#d9a441,#a6742a);
+    box-shadow:0 3px 0 #81551d;
+  }
+  .detail-cta:hover{
+    color:#805718;
+    border-color:#a6742a;
+    background:transparent;
+    box-shadow:none;
+  }
+
+  footer{color:#c5d9d0}
+  .footer-suits{color:#d8e7e0}
+  .footer-suits span:nth-child(2),
+  .footer-suits span:nth-child(3){color:#e39a91}
 </style>
 </head>
 <body>
@@ -725,7 +862,7 @@
 
       <div class="quest-grid">
         <a class="quest-card active" href="rules/"
-           style="--accent:#d7b66d"
+           style="--accent:#a6742a"
            data-num="01" data-suit="♠" data-sub="READ THE TABLE"
            data-title="ルール編"
            data-desc="役の強さ、テキサスホールデムの進め方、メインポットとサイドポットの仕組みまで。3ステージでゲームの土台をつくる。">
@@ -745,7 +882,7 @@
         </a>
 
         <a class="quest-card" href="strategy/"
-           style="--accent:#b9cabe"
+           style="--accent:#2f8f65"
            data-num="02" data-suit="♣" data-sub="PLAY THE RANGE"
            data-title="戦略編"
            data-desc="ポジション、アウツとオッズ、レンジ思考、ブロッカー、ベットサイジングの数学。9ステージで実戦の判断力を鍛える。">
@@ -765,7 +902,7 @@
         </a>
 
         <a class="quest-card" href="challenge/"
-           style="--accent:#a9554f"
+           style="--accent:#b55049"
            data-num="03" data-suit="♥" data-sub="TAKE THE SEAT"
            data-title="総合チャレンジ"
            data-desc="CPU4人との円卓で持ちチップを賭けて実戦。チェック、ベット、コール、レイズ、フォールドの駆け引きを試す最終試練。">
@@ -785,7 +922,7 @@
         </a>
 
         <a class="quest-card" href="https://gamblers-mathematics.habatakijuku.com/poker/worldchamp-guide/"
-           style="--accent:#e7cf91"
+           style="--accent:#7b63a8"
            data-num="04" data-suit="♦" data-sub="GO GLOBAL"
            data-title="世界大会ガイド"
            data-desc="WSOPをはじめとする世界大会のエントリー方法、大会形式、賞金の仕組みまで。実際に世界へ挑戦するための完全ガイド。">
