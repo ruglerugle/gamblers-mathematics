@@ -45,10 +45,12 @@ button,a{-webkit-tap-highlight-color:transparent}
 .hero-copy{max-width:560px}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:rgba(217,164,65,.18);
   border:1.5px solid var(--gold);color:var(--gold-light);font-size:11.5px;font-weight:900;letter-spacing:.06em;margin-bottom:14px}
-.hero h1{color:#fffdf7;font-size:clamp(26px,5.4vw,38px);font-weight:900;line-height:1.35;letter-spacing:.01em;
+.hero h1{color:#fffdf7;font-size:clamp(24px,5vw,36px);font-weight:900;line-height:1.5;letter-spacing:.01em;
   text-shadow:0 4px 16px rgba(0,0,0,.3)}
+.hero h1 .line{display:block;white-space:nowrap}
 .hero h1 .accent{color:var(--gold-light)}
-.hero p{max-width:480px;margin:14px auto 0;color:#e2efe9;font-size:13.5px;font-weight:700;line-height:1.85}
+.hero p{max-width:440px;margin:16px auto 0;color:#e2efe9;font-size:13.5px;font-weight:700;line-height:2}
+.nowrap{white-space:nowrap}
 .hero-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.1);
   border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11px;font-weight:800}
@@ -99,6 +101,7 @@ footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-co
 @media (max-width:520px){
   .hero-mascot{display:none}
   .topbar .pill{display:none}
+  .hero h1{font-size:clamp(21px,7vw,28px)}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -121,8 +124,8 @@ footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-co
     <img class="hero-mascot" src="images/cat.png" alt="ねこメンター" aria-hidden="true">
     <div class="hero-copy">
       <span class="hero-badge">POKER EDITION</span>
-      <h1>役を覚えるだけじゃ、勝てない。<br><span class="accent">数学で読む、ポーカー入門。</span></h1>
-      <p>確率・ポジション・ベットの意味を、ねこメンターとうさ美と一緒に楽しく攻略。テキサスホールデムを「運」から「判断」のゲームに変えよう。</p>
+      <h1><span class="line">役を覚えるだけじゃ、</span><span class="line">勝てない。</span><span class="line accent">数学で読む、ポーカー入門。</span></h1>
+      <p>確率・ポジション・ベットの意味を、<span class="nowrap">ねこメンター</span>と<span class="nowrap">うさ美</span>と一緒に楽しく攻略。<br class="lp-br"><span class="nowrap">テキサスホールデム</span>を「運」から「判断」のゲームに変えよう。</p>
       <div class="hero-chips">
         <span class="chip">🆓 登録不要</span>
         <span class="chip">📱 ブラウザだけでOK</span>
