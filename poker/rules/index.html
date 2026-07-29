@@ -35,7 +35,7 @@ body{font-family:var(--f);color:var(--ink);font-weight:600;min-height:100vh;
 .game-header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;color:#fff;padding:10px 16px;
   background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.14));border-radius:12px;border:1px solid rgba(255,255,255,.15)}
 .brand{display:flex;flex-direction:column;gap:2px;min-width:220px}
-.brand-title{font-size:22px;font-weight:950;letter-spacing:.02em;color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.brand-title{display:flex;align-items:center;gap:9px;font-size:22px;font-weight:950;letter-spacing:.02em;color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.4)}
 .brand-sub{font-size:12.5px;font-weight:800;color:#d9ece7}
 .head-progress-wrap{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
 .head-progress-label{font-size:11.5px;color:#cfe4de;font-weight:800}
@@ -367,7 +367,7 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 <div class="app-shell side-collapsed" id="app-shell">
   <header class="game-header">
     <div class="brand">
-      <div class="brand-title">🃏 POKER QUEST ルール編</div>
+      <div class="brand-title"><a class="head-reset home-badge" href="../index.html" title="ポーカークエスト目次へ" aria-label="ポーカークエスト目次へ">🃏</a> <span>POKER QUEST ルール編</span></div>
       <div class="brand-sub">― テキサスホールデムの基礎 ―</div>
     </div>
     <div class="head-progress-wrap">
@@ -375,7 +375,6 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
       <div class="head-progress"><div class="head-progress-fill" id="progress-fill"></div></div>
     </div>
     <div class="header-actions">
-      <a class="head-reset home-badge" href="../index.html" title="ポーカークエスト目次へ" aria-label="ポーカークエスト目次へ">🏠</a>
       <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
       <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
     </div>
