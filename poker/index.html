@@ -35,11 +35,9 @@ button,a{-webkit-tap-highlight-color:transparent}
 .brand-copy{display:flex;flex-direction:column;line-height:1.25}
 .brand-copy strong{font-size:18px;font-weight:900;letter-spacing:.02em;color:var(--gold-light)}
 .brand-copy small{margin-top:2px;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#cfe4de}
-.topbar .pill{margin-left:auto;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.35);
-  font-size:11.5px;font-weight:900;letter-spacing:.04em;color:#fff;white-space:nowrap}
 
 /* Hero */
-.hero{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:18px;padding:18px 10px 8px;text-align:center}
+.hero{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:18px;padding:22px 10px 16px;text-align:center}
 .hero-mascot{width:104px;flex-shrink:0;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));transform:translateY(6px)}
 .hero-mascot.right{transform:translateY(6px) scaleX(-1)}
 .hero-copy{max-width:560px}
@@ -51,9 +49,6 @@ button,a{-webkit-tap-highlight-color:transparent}
 .hero h1 .accent{color:var(--gold-light)}
 .hero p{max-width:440px;margin:16px auto 0;color:#e2efe9;font-size:13.5px;font-weight:700;line-height:2}
 .nowrap{white-space:nowrap}
-.hero-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11px;font-weight:800}
 
 /* Quest board */
 .board{margin-top:30px;padding:22px 20px 26px;background:var(--paper);border:1px solid #e3d8bd;border-radius:22px;box-shadow:var(--shadow)}
@@ -100,7 +95,6 @@ footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-co
 }
 @media (max-width:520px){
   .hero-mascot{display:none}
-  .topbar .pill{display:none}
   .hero h1{font-size:clamp(21px,7vw,28px)}
 }
 @media (prefers-reduced-motion:reduce){
@@ -117,7 +111,6 @@ footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-co
       <strong>POKER QUEST</strong>
       <small>ギャンブラーのための数学</small>
     </span>
-    <span class="pill">全4クエスト・無料</span>
   </nav>
 
   <header class="hero">
@@ -126,11 +119,6 @@ footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-co
       <span class="hero-badge">POKER EDITION</span>
       <h1><span class="line">役を覚えるだけじゃ、</span><span class="line">勝てない。</span><span class="line accent">数学で読む、ポーカー入門。</span></h1>
       <p>確率・ポジション・ベットの意味を、<span class="nowrap">ねこメンター</span>と<span class="nowrap">うさ美</span>と一緒に楽しく攻略。<span class="nowrap">テキサスホールデム</span>を「運」から「判断」のゲームに変えよう。</p>
-      <div class="hero-chips">
-        <span class="chip">🆓 登録不要</span>
-        <span class="chip">📱 ブラウザだけでOK</span>
-        <span class="chip">🎯 全4クエスト</span>
-      </div>
     </div>
     <img class="hero-mascot right" src="images/rabbit.png" alt="うさ美" aria-hidden="true">
   </header>
