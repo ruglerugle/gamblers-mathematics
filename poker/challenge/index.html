@@ -497,7 +497,7 @@ function renderDialogue(lines){
     let img;
     if(l.who==='coach'){ img = (coachTurn++ % 2===0) ? '../images/cat.png' : '../images/catThink.png'; }
     else { img = (stuTurn++ % 2===0) ? '../images/rabbit.png' : '../images/rabbitThink.png'; }
-    const name = l.who==='coach' ? 'コーチ' : 'うさ美';
+    const name = l.who==='coach' ? 'ねこメンター' : 'うさ美';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
       <div class="dialog-bubble">${l.text}</div>

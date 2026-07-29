@@ -252,7 +252,7 @@ function renderDialogue(lines){
   return lines.map(l=>{
     const isStu = l.who === 'stu';
     const icon = l.who==='coach' ? '🎩' : '🔰';
-    const name = l.who==='coach' ? 'ガイド役' : 'ミカ（挑戦者）';
+    const name = l.who==='coach' ? 'ねこメンター' : 'うさ美';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}">${icon}</div><div class="dialog-name ${l.who}">${name}</div></div>
       <div class="dialog-bubble">${l.text}</div>
