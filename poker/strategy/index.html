@@ -462,12 +462,12 @@ function classifyBucket(score){ if(score>=10) return 'premium'; if(score>=7) ret
    dialogue renderer
    ===================================================================== */
 function renderDialogue(lines){
-  let coachTurn = 0, stuTurn = 0;
+  let coachTurn = 0;
   return lines.map(l=>{
     const isStu = l.who === 'stu';
     let img;
     if(l.who==='coach'){ img = (coachTurn++ % 2===0) ? '../images/cat.webp' : '../images/catThink.webp'; }
-    else { img = (stuTurn++ % 2===0) ? '../images/rabbit.webp' : '../images/rabbitThink.webp'; }
+    else { img = l.face==='think' ? '../images/rabbitThink.webp' : '../images/rabbit.webp'; }
     const name = l.who==='coach' ? 'ねこメンター' : 'うさ美';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
@@ -1148,7 +1148,7 @@ const STAGES = [
     dialogue:[
       {who:'coach', text:'ここからは「戦略編」だよ。役の見分け方やテキサスホールデムの流れは「ルール編」で済んでいる前提で進めるよ。もしまだなら、左上のアイコンから目次に戻って先にどうぞ。'},
       {who:'coach', text:'勝負する前、配られた2枚だけで「参加すべきか」を判断する力が重要だよ。プロが使う考え方を簡易版で紹介しよう。'},
-      {who:'stu', text:'AAとかKKは強そうって分かるんですけど、それ以外は難しいです…'},
+      {who:'stu', face:'think', text:'AAとかKKは強そうって分かるんですけど、それ以外は難しいです…'},
       {who:'coach', text:'「チェン・フォーミュラ」という点数化の考え方があるんだ。高い数字ほど、ペアほど、同じスート(スーテッド)ほど、数字が近い(コネクター)ほど点数が上がるよ。点数で4段階に分けて考えてみよう。'},
     ],
     build: buildStarting,
@@ -1158,7 +1158,7 @@ const STAGES = [
     missionText:'座席(ポジション)による情報量の違いを確認し、6問正解でクリアしよう。',
     dialogue:[
       {who:'coach', text:'ハンドの強さだけじゃなく、「どこに座っているか」も勝率に関わってくるよ。「ポジション」という考え方を紹介しよう。'},
-      {who:'stu', text:'座席で勝率が変わるんですか？ カードは同じ強さなのに？'},
+      {who:'stu', face:'think', text:'座席で勝率が変わるんですか？ カードは同じ強さなのに？'},
       {who:'coach', text:'ああ。ポーカーは自分の手札だけでなく、相手の行動から得る情報も判断材料になるんだ。行動の順番によって、得られる情報量が全然違うんだよ。'},
     ],
     build: buildPosition,
@@ -1168,7 +1168,7 @@ const STAGES = [
     missionText:'5つの場面で「アウツの数」と「完成する確率」を見積もろう。10問すべて正解でクリア。',
     dialogue:[
       {who:'coach', text:'役があと少しで完成する状態を「ドロー」と呼ぶよ。役を完成させてくれる残りカードの枚数を「アウツ」というんだ。'},
-      {who:'stu', text:'アウツが分かると何が嬉しいんですか？'},
+      {who:'stu', face:'think', text:'アウツが分かると何が嬉しいんですか？'},
       {who:'coach', text:'アウツの枚数から、大まかな完成確率が計算できるよ。「4-2ルール」——残り2枚見られるならアウツ×4%、残り1枚ならアウツ×2%、これだけで概算できるんだ。'},
     ],
     build: buildOuts,
@@ -1188,7 +1188,7 @@ const STAGES = [
     missionText:'「今のポットオッズ」だけでなく「将来の見込み」まで加味してコール判断しよう。7問正解でクリア。',
     dialogue:[
       {who:'coach', text:'ポットオッズは便利だけど、実は「今のポット」しか見ていないんだ。もう一歩進んだ考え方を紹介しよう。'},
-      {who:'stu', text:'今のポットだけじゃダメなんですか？'},
+      {who:'stu', face:'think', text:'今のポットだけじゃダメなんですか？'},
       {who:'coach', text:'ドローが完成した後も、まだベッティングラウンドが残っていることが多いよ。そこで相手からさらに引き出せる見込み額まで含めて考えるのが「インプライドオッズ」だよ。'},
     ],
     build: buildImpliedOdds,
@@ -1198,7 +1198,7 @@ const STAGES = [
     missionText:'ポジションによってレンジ(参加するハンドの範囲)が変わることを確認し、5問正解でクリアしよう。',
     dialogue:[
       {who:'coach', text:'ここまでは相手の手を意識せず、自分のハンドとオッズだけで考えてきた。次は一歩進んで、相手の手を「レンジ」で読む技術を紹介しよう。'},
-      {who:'stu', text:'相手が何を持っているか、当てるということですか？'},
+      {who:'stu', face:'think', text:'相手が何を持っているか、当てるということですか？'},
       {who:'coach', text:'1つに決め打ちはしないよ。「ポジションやここまでの行動から考えて、あり得る手の範囲はこのあたりだ」と分布で捉えるんだ。ポジションが良いほど、その範囲は広くなるよ。'},
     ],
     build: buildRange,
@@ -1208,7 +1208,7 @@ const STAGES = [
     missionText:'具体例で「組み合わせが減る」感覚をつかんでから、6問正解でクリアしよう。',
     dialogue:[
       {who:'coach', text:'レンジの考え方に、もう1つ武器を追加しよう。実は自分の手札そのものが、相手のレンジを絞り込むヒントになるんだ。'},
-      {who:'stu', text:'自分の手札で、相手のことが分かるんですか？'},
+      {who:'stu', face:'think', text:'自分の手札で、相手のことが分かるんですか？'},
       {who:'coach', text:'ああ。デッキは52枚しかないんだ。自分がすでに2枚持っていたら、相手が同じカードを持つことは絶対にできない——この仕組みを「ブロッカー」と呼ぶよ。具体例で見てみよう。'},
     ],
     build: buildBlockers,
@@ -1218,7 +1218,7 @@ const STAGES = [
     missionText:'具体例で「損得なしのライン」を体感してから、7問正解でクリアしよう。',
     dialogue:[
       {who:'coach', text:'最後に、「いくら賭けるか」自体にも数学があることを紹介しよう。'},
-      {who:'stu', text:'コールするかどうかの式は習いましたけど、ベット額を決める式もあるんですか？'},
+      {who:'stu', face:'think', text:'コールするかどうかの式は習いましたけど、ベット額を決める式もあるんですか？'},
       {who:'coach', text:'あるよ。でも先に数式を出すと分かりにくいから、まずは具体的な数字で見てみよう。「ブラフしたけど何回かに1回は見破られる」という状況を、3回繰り返した場合で考えてみるんだ。'},
       {who:'stu', text:'なるほど、まず数を数えてみるんですね。'},
       {who:'coach', text:'そう。下の例を1つずつ読んでみて。最後にちゃんと式にまとめるから安心して。'},
@@ -1230,7 +1230,7 @@ const STAGES = [
     missionText:'盤面が「乾いている」か「濡れている」かを見極めて、9問正解でクリアしよう。',
     dialogue:[
       {who:'coach', text:'最後の仕上げに、ここまでの知識を1つにまとめる考え方を紹介しよう。「盤面(フロップ)の質」だよ。'},
-      {who:'stu', text:'盤面にも良し悪しがあるんですか？'},
+      {who:'stu', face:'think', text:'盤面にも良し悪しがあるんですか？'},
       {who:'coach', text:'ドローが絡みやすい「濡れた」盤面と、あまり絡まない「乾いた」盤面があるよ。レンジ・ベットサイジング・ブロッカー、ここまで学んだことが全部ここに関わってくるんだ。'},
     ],
     build: buildBoardTexture,

@@ -120,12 +120,12 @@ function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt
    dialogue renderer (coach / student)
    ===================================================================== */
 function renderDialogue(lines){
-  let coachTurn = 0, stuTurn = 0;
+  let coachTurn = 0;
   return lines.map(l=>{
     const isStu = l.who === 'stu';
     let img;
     if(l.who==='coach'){ img = (coachTurn++ % 2===0) ? '../images/cat.webp' : '../images/catThink.webp'; }
-    else { img = (stuTurn++ % 2===0) ? '../images/rabbit.webp' : '../images/rabbitThink.webp'; }
+    else { img = l.face==='think' ? '../images/rabbitThink.webp' : '../images/rabbit.webp'; }
     const name = l.who==='coach' ? 'ねこメンター' : 'うさ美';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
@@ -353,7 +353,7 @@ const CHAPTERS = [
       {who:'coach', text:'「ポーカーの世界大会」と聞いて多くの人が思い浮かべるのが、毎年アメリカ・ラスベガスで開催される「WSOP(World Series of Poker)」だよ。'},
       {who:'stu', text:'テレビや配信で見たことあります!世界中からプレイヤーが集まるんですよね？'},
       {who:'coach', text:'そう。1970年にラスベガスのカジノで始まって、今では100種目を超えるブレスレット(優勝記念リング)がかかった大会が1シリーズの中で行われる、まさに「ポーカーの祭典」なんだ。'},
-      {who:'stu', text:'中でも一番有名なのが…？'},
+      {who:'stu', face:'think', text:'中でも一番有名なのが…？'},
       {who:'coach', text:'「メインイベント」だよ。バイイン$10,000のノーリミット・テキサスホールデムで、優勝すれば世界チャンピオンの称号と数億円規模の賞金が手に入るんだ。まずは下で全体像を確認しよう。'},
     ],
     build: buildOverview,
@@ -363,7 +363,7 @@ const CHAPTERS = [
     missionText:'2つのエントリー方法と、出場までの具体的な流れ、注意点を確認しよう。',
     dialogue:[
       {who:'coach', text:'いよいよ実際にエントリーする方法だよ。ルートは大きく2つあるんだ。'},
-      {who:'stu', text:'$10,000をポンと払うのはさすがにハードルが高いです…！'},
+      {who:'stu', face:'think', text:'$10,000をポンと払うのはさすがにハードルが高いです…！'},
       {who:'coach', text:'そういう人のために「サテライト」という仕組みがあるんだ。安いバイインのミニトーナメントに勝ち残れば、本戦への切符が手に入るんだよ。実際に大勢のプレイヤーがこのルートでメインイベントに参加しているんだ。'},
       {who:'stu', text:'なるほど!具体的な手順や注意点も知りたいです。'},
       {who:'coach', text:'下にエントリーまでの流れと、年齢制限・身分証明・渡航まわりの注意点をまとめておいたよ。'},
@@ -375,7 +375,7 @@ const CHAPTERS = [
     missionText:'エントリー後、実際に大会がどう進行していくのかをステップで確認しよう。',
     dialogue:[
       {who:'coach', text:'無事にエントリーできたら、今度は大会本番の流れを知っておこう。'},
-      {who:'stu', text:'1万人規模の大会って、どうやって進行するんですか？'},
+      {who:'stu', face:'think', text:'1万人規模の大会って、どうやって進行するんですか？'},
       {who:'coach', text:'複数の開始日(フライト)に分けてスタートし、勝ち残った人たちが合流していく方式なんだ。下のステッパーで、エントリーからチャンピオン誕生までの流れを順番に見ていこう。'},
     ],
     build: buildStructure,
@@ -385,9 +385,9 @@ const CHAPTERS = [
     missionText:'賞金プールの仕組みと、上位に厚く配分されるペイアウトカーブ、税金の注意点を確認しよう。',
     dialogue:[
       {who:'coach', text:'多くの人が一番気になるのが賞金だろう。基本的な考え方から見ていこう。'},
-      {who:'stu', text:'優勝したらいくらもらえるものなんですか？'},
+      {who:'stu', face:'think', text:'優勝したらいくらもらえるものなんですか？'},
       {who:'coach', text:'年や参加者数によって大きく変わるけど、2023年のメインイベントでは優勝賞金が1200万ドルを超えたんだ。ただし上位ほど取り分が急激に増える配分になっているのがポイントだよ。'},
-      {who:'stu', text:'税金とかも気になります…。'},
+      {who:'stu', face:'think', text:'税金とかも気になります…。'},
       {who:'coach', text:'その通り、海外での賞金には源泉徴収の問題もあるんだ。下でまとめて確認しておこう。'},
     ],
     build: buildPrize,
@@ -407,7 +407,7 @@ const CHAPTERS = [
     missionText:'実際に挑戦する前に押さえておきたい、資金管理や現地マナーなどのポイントを確認しよう。',
     dialogue:[
       {who:'coach', text:'最後に、実際に挑戦する前に押さえておきたい心構えをまとめておこう。'},
-      {who:'stu', text:'夢は大きいですけど、いきなり無理はしたくないです…！'},
+      {who:'stu', face:'think', text:'夢は大きいですけど、いきなり無理はしたくないです…！'},
       {who:'coach', text:'その感覚が大事だよ。バンクロール管理やサテライトの活用、現地マナーまで、下で一通り確認していこう。'},
     ],
     build: buildTips,

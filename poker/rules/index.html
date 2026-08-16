@@ -524,12 +524,12 @@ const CATEGORY_BUILDERS = [buildHighCard,buildOnePair,buildTwoPair,buildThreeKin
    dialogue renderer
    ===================================================================== */
 function renderDialogue(lines){
-  let coachTurn = 0, stuTurn = 0;
+  let coachTurn = 0;
   return lines.map(l=>{
     const isStu = l.who === 'stu';
     let img;
     if(l.who==='coach'){ img = (coachTurn++ % 2===0) ? '../images/cat.webp' : '../images/catThink.webp'; }
-    else { img = (stuTurn++ % 2===0) ? '../images/rabbit.webp' : '../images/rabbitThink.webp'; }
+    else { img = l.face==='think' ? '../images/rabbitThink.webp' : '../images/rabbit.webp'; }
     const name = l.who==='coach' ? 'ねこメンター' : 'うさ美';
     return `<div class="dialog-row${isStu?' right':''}">
       <div class="dialog-character"><div class="dialog-avatar ${l.who}"><img src="${img}" alt="${name}"></div><div class="dialog-name ${l.who}">${name}</div></div>
@@ -1028,7 +1028,7 @@ const STAGES = [
     missionText:'上の一覧で10種類の役を確認したら、6問のクイズすべてに正解しよう。',
     dialogue:[
       {who:'coach', text:'ポーカーはカード5枚の組み合わせ「役」の強さを競うゲームだよ。まずは強い順に10種類、しっかり頭に入れよう。'},
-      {who:'stu', text:'名前は聞いたことあっても、実際どのカードがどの役なのか自信ないです…！'},
+      {who:'stu', face:'think', text:'名前は聞いたことあっても、実際どのカードがどの役なのか自信ないです…！'},
       {who:'coach', text:'大丈夫、下の一覧で実物を見比べながら覚えていこう。覚えたら腕試しのクイズだよ。'},
     ],
     build: buildBasics,
@@ -1038,7 +1038,7 @@ const STAGES = [
     missionText:'2つの5枚の手札を見比べて、勝つ方を当てよう。5問正解でクリア。',
     dialogue:[
       {who:'coach', text:'役の名前を覚えたら、次は「同じ役同士でどちらが強いか」を見極める番だよ。'},
-      {who:'stu', text:'同じワンペアでも、勝ち負けがあるんですか？'},
+      {who:'stu', face:'think', text:'同じワンペアでも、勝ち負けがあるんですか？'},
       {who:'coach', text:'その通り。ペアの数字や、残りの「キッカー」と呼ばれるカードの大きさで決まるんだよ。実際に比べてみよう。'},
     ],
     build: buildCompare,
